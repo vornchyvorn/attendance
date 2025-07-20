@@ -1,36 +1,34 @@
 <?php
 session_start();
 include '../db/conn.php';
-$profile_img = '../pic/user.png'; 
-$user_id = $_SESSION['user_id'] ?? 0;
 
-if ($user_id) {
-    $stmt = $conn->prepare("SELECT image FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        if (!empty($row['image']) && file_exists("../uploads/" . $row['image'])) {
-            $profile_img = "../uploads/" . $row['image'];
-        }
-    }
-    $stmt->close();
-}
-
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login_admin.php"); 
+// Redirect to login if not admin
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../admin/login_admin.php');
     exit();
 }
 
-$error = '';
-$success = '';
+$profile_img = '../pic/user.png'; 
+$admin_id = $_SESSION['admin_id'];
+
+$stmt = $conn->prepare("SELECT image FROM admin WHERE admin_id = ?");
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($row = $result->fetch_assoc()) {
+    if (!empty($row['image']) && file_exists("../uploads/" . $row['image'])) {
+        $profile_img = "../uploads/" . $row['image'];
+    }
+}
+$stmt->close();
+
 
 // Form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
     $status = $_POST['status'] ?? 'active';
-    $created_by = $_SESSION['user_id']; // From session
+    $created_by = $_SESSION['admin_id']; // From session
 
     if ($title && $content) {
         $stmt = $conn->prepare("INSERT INTO announcements (title, content, created_at, created_by, status) VALUES (?, ?, NOW(), ?, ?)");
@@ -137,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </li>
     </ul>
 </aside>
-<main class="flex-1 ml-0 transition-all duration-300" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
+<main class="flex-1 ml-0 duration-0" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
     <!-- Top navbar -->
     <div class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
         <button @click="sidebarOpen = !sidebarOpen" class="text-xl text-gray-700 hover:text-blue-500">
@@ -165,13 +163,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
     <h1 class="text-xl font-bold text-green-700 mb-4 text-center">បង្កើតសេចក្ដីជូនដំណឹង</h1>
 
-    <?php if ($error): ?>
+    <!-- <?php if ($error): ?>
       <div class="bg-red-100 text-red-700 p-3 rounded mb-4"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
     <?php if ($success): ?>
       <div class="bg-green-100 text-green-700 p-3 rounded mb-4"><?= htmlspecialchars($success) ?></div>
-    <?php endif; ?>
+    <?php endif; ?> -->
 
     <form method="POST" class="space-y-4">
       <div>

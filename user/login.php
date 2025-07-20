@@ -1,34 +1,38 @@
 <?php
 session_start();
 include '../db/conn.php';
+
 $error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $student_id = $_POST['student_id'];
-    $password = $_POST['password'];
+    $student_id = trim($_POST['student_id']);
+    $password = trim($_POST['password']);
+
     $stmt = $conn->prepare("SELECT * FROM users WHERE student_id = ?");
     $stmt->bind_param("s", $student_id);
     $stmt->execute();
     $result = $stmt->get_result();
+
     if ($row = $result->fetch_assoc()) {
         if (password_verify($password, $row['password'])) {
-            if ($row['role'] === 'admin') {
-                $error = "សូមចូលតាមគេហទំព័ររបស់អ្នកគ្រប់គ្រង!";
-            } else {
-                $_SESSION['user_id'] = $row['id'];
-                $_SESSION['student_id'] = $row['student_id'];
-                $_SESSION['username'] = $row['username'];
-                $_SESSION['role'] = $row['role'];
-                header("Location: dashboard.php");
-                exit;
-            }
+
+            $_SESSION['user_id'] = $row['id'];
+            $_SESSION['student_id'] = $row['student_id'];
+            $_SESSION['username'] = $row['username'];
+            $_SESSION['user_type'] = $row['user_type']; // student / teacher
+
+            header("Location: dashboard.php");
+            exit;
+
+        } else {
+            $error = "អត្តលេខ ឬ ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!";
         }
-    }
-    if (!$error) {
+    } else {
         $error = "អត្តលេខ ឬ ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="km">
 <head>

@@ -2,24 +2,15 @@
 session_start();
 include '../db/conn.php';
 
-// Debug: បង្ហាញ session info ដើម្បីពិនិត្យ
-
-
-// ពិនិត្យ session variable
-if (!isset($_SESSION['user_id'], $_SESSION['role'])) {
-    echo "Session variables 'user_id' or 'role' មិនបានកំណត់ទេ!";
-    exit;
-}
-
-if ($_SESSION['role'] !== 'user') {
-    echo "Role ដែលបានកំណត់: " . htmlspecialchars($_SESSION['role']) . "<br>";
-    echo "មិនមានសិទ្ធិចូលទំព័រនេះទេ!";
-    exit;
+// 🔐 ពិនិត្យសុវត្ថិភាព
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../auth/login.php");
+    exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
-// Handle image upload
+// ✅ Upload image ប្រសិនបើមាន
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     $imgName = $_FILES['image']['name'];
     $tmpName = $_FILES['image']['tmp_name'];
@@ -31,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
         $uploadPath = '../upload_img/' . $newName;
 
         if (move_uploaded_file($tmpName, $uploadPath)) {
+            // update database
             $stmt = $conn->prepare("UPDATE users SET image = ? WHERE id = ?");
             $stmt->bind_param("si", $newName, $user_id);
             $stmt->execute();
@@ -38,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     }
 }
 
-// Fetch user data
+// ✅ ទាញយកព័ត៌មានអ្នកប្រើ
 $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -49,21 +41,21 @@ if (!$row = $result->fetch_assoc()) {
     exit;
 }
 
+// ✅ Prepare display data
 $profile_img = '../pic/user.png';
 if (!empty($row['image']) && file_exists("../upload_img/" . $row['image'])) {
     $profile_img = "../upload_img/" . $row['image'];
 }
 
 $username = htmlspecialchars($row['username']);
-$student_id = htmlspecialchars($row['student_id'] ?? 'N/A');
+$student_id = htmlspecialchars($row['student_id'] ?? 'មិនមាន');
 $gender = htmlspecialchars($row['gender']);
 $gmail = htmlspecialchars($row['gmail']);
-$major = htmlspecialchars($row['major'] ?? 'N/A');
+$major = htmlspecialchars($row['major'] ?? 'មិនមាន');
 $date = htmlspecialchars($row['date']);
-$user_type = htmlspecialchars($row['user_type'] ?? 'N/A');
-$address = htmlspecialchars($row['address'] ?? 'N/A');
+$user_type = htmlspecialchars($row['user_type'] ?? 'មិនមាន');
+$address = htmlspecialchars($row['address'] ?? 'មិនមាន');
 ?>
-
 <!DOCTYPE html>
 <html lang="km">
 <head>

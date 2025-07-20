@@ -1,42 +1,41 @@
 <?php
 session_start();
 include '../db/conn.php';
-$profile_img = '../pic/user.png';
-$user_id = $_SESSION['user_id'] ?? 0;
 
-// Only admin access
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login_admin.php");
+// Redirect to login if not admin
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../admin/login_admin.php');
     exit();
 }
 
-// Fetch profile image
-if ($user_id) {
-    $stmt = $conn->prepare("SELECT image FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        if (!empty($row['image']) && file_exists("../uploads/" . $row['image'])) {
-            $profile_img = "../uploads/" . $row['image'];
-        }
-    }
-    $stmt->close();
-}
+$profile_img = '../pic/user.png'; 
+$admin_id = $_SESSION['admin_id'];
 
-// Filters (adapt variable names for form inputs)
+$stmt = $conn->prepare("SELECT image FROM admin WHERE admin_id = ?");
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($row = $result->fetch_assoc()) {
+    if (!empty($row['image']) && file_exists("../uploads/" . $row['image'])) {
+        $profile_img = "../uploads/" . $row['image'];
+    }
+}
+$stmt->close();
+
+
+
 $major = $_GET['major_name'] ?? '';
 $time_period = $_GET['time_period'] ?? '';
 $event_start = $_GET['event_start'] ?? '';
 $event_end = $_GET['event_end'] ?? '';
 
-// Pagination variables
+
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $limit_options = [10, 25, 50, 100];
 $limit = isset($_GET['limit']) && in_array((int) $_GET['limit'], $limit_options) ? (int) $_GET['limit'] : 10;
 $offset = ($page - 1) * $limit;
 
-// WHERE conditions
+
 $where = "1";
 $params = [];
 $types = "";
@@ -214,7 +213,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
             </li>
         </ul>
     </aside>
-    <main class="flex-1 ml-0 transition-all duration-300" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
+    <main class="flex-1 ml-0 duration-0" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
         <div class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
             <button @click="sidebarOpen = !sidebarOpen" class="text-xl text-gray-700 hover:text-blue-500">
                 <i :class="sidebarOpen ? 'fa-bars' : 'fa-bars'" class="fa-solid"></i>

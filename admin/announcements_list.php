@@ -1,17 +1,18 @@
-<?php 
+<?php
 session_start();
 include '../db/conn.php';
 
-
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login_admin.php"); 
+// Redirect to login if not admin
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../admin/login_admin.php');
+    exit();
 }
 
 $profile_img = '../pic/user.png'; 
-$user_id = $_SESSION['user_id'];
+$admin_id = $_SESSION['admin_id'];
 
-$stmt = $conn->prepare("SELECT image FROM users WHERE id = ?");
-$stmt->bind_param("i", $user_id);
+$stmt = $conn->prepare("SELECT image FROM admin WHERE admin_id = ?");
+$stmt->bind_param("i", $admin_id);
 $stmt->execute();
 $result = $stmt->get_result();
 if ($row = $result->fetch_assoc()) {
@@ -20,7 +21,6 @@ if ($row = $result->fetch_assoc()) {
     }
 }
 $stmt->close();
-
 
 $sql = "SELECT * FROM announcements ORDER BY created_at DESC";
 $result = $conn->query($sql);
@@ -120,7 +120,7 @@ $result = $conn->query($sql);
         </li>
     </ul>
 </aside>
-<main class="flex-1 ml-0 transition-all duration-300" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
+<main class="flex-1 ml-0 duration-0" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
     <!-- Top navbar -->
     <div class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
         <button @click="sidebarOpen = !sidebarOpen" class="text-xl text-gray-700 hover:text-blue-500">

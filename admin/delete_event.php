@@ -3,8 +3,8 @@ session_start();
 include '../db/conn.php';
 
 // Check if admin is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: ../user/login.php");
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login_admin.php");
     exit();
 }
 
@@ -17,7 +17,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $stmt->bind_param("i", $id);
 
     if ($stmt->execute()) {
-        // Redirect back to list with success
+     
         header("Location: events_list.php?deleted=1");
         exit();
     } else {

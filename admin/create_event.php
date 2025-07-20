@@ -2,11 +2,11 @@
 session_start();
 include '../db/conn.php';
 $profile_img = '../pic/user.png'; 
-$user_id = $_SESSION['user_id'] ?? 0;
+$admin_id = $_SESSION['admin_id'] ?? 0;
 
-if ($user_id) {
-    $stmt = $conn->prepare("SELECT image FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
+if ($admin_id) {
+    $stmt = $conn->prepare("SELECT image FROM admin WHERE admin_id = ?");
+    $stmt->bind_param("i", $admin_id);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($row = $result->fetch_assoc()) {
@@ -16,10 +16,11 @@ if ($user_id) {
     }
     $stmt->close();
 }
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login_admin.php"); 
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../admin/login_admin.php');
     exit();
 }
+
 
 // Insert event when submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -132,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </ul>
 </aside>
 <!-- Main content -->
-<main class="flex-1 ml-0 transition-all duration-300" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
+<main class="flex-1 ml-0 duration-0" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
     <div class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
         <button @click="sidebarOpen = !sidebarOpen" class="text-xl text-gray-700 hover:text-blue-500">
             <i :class="sidebarOpen ? 'fa-bars' : 'fa-bars'" class="fa-solid"></i>

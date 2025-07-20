@@ -1,35 +1,45 @@
 <?php
 session_start();
 include '../db/conn.php';
-$error = "";
+
+$error = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
-    $stmt = $conn->prepare("SELECT id, username, password, role FROM users WHERE username = ? AND role='admin' LIMIT 1");
-    if ($stmt) {
-        $stmt->bind_param("s", $username);
+    $role = $_POST['role']; 
+
+    // Check that role is valid
+    if (!in_array($role, ['admin', 'staff'])) {
+        $error = "តួនាទីមិនត្រឹមត្រូវ!";
+    } else {
+        $stmt = $conn->prepare("SELECT * FROM admin WHERE username = ? AND role = ? LIMIT 1");
+        $stmt->bind_param("ss", $username, $role);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        if ($result->num_rows === 1) {
-            $user = $result->fetch_assoc();
-            if (password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-                header('Location: ../admin/dashbord.php');
+        if ($admin = $result->fetch_assoc()) {
+            if (password_verify($password, $admin['password'])) {
+                $_SESSION['admin_id'] = $admin['admin_id'];
+                $_SESSION['username'] = $admin['username'];
+                $_SESSION['role'] = $admin['role'];
+
+                // ✅ Extra condition for staff
+                if ($admin['role'] === 'staff') {
+                    header("Location: staff_dashboard.php");
+                } else {
+                    header("Location: dashbord.php"); // default for admin
+                }
                 exit;
             } else {
-                $error = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ។";
+                $error = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!";
             }
         } else {
-            $error = "មិនមានគណនី Admin នេះទេ។";
+            $error = "ឈ្មោះអ្នកប្រើ ឬតួនាទីមិនត្រឹមត្រូវ!";
         }
-    } else {
-        $error = "បញ្ហាប្រព័ន្ធក្នុងពេលប្រតិបត្តិការ។";
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -48,17 +58,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </style>
 </head>
 
-<body class="bg-gradient-to-r from-emerald-500 to-emerald-900 flex items-center justify-center h-screen">
+<body class="bg-gradient-to-r from-emerald-500 to-emerald-900 flex items-center justify-center h-screen"> 
     <div class="container flex items-center justify-center">
         <form method="POST" class="bg-white p-6 rounded shadow w-100">
-        <img src="../pic/logo.jpg" alt="logo" class="w-20 block m-auto mb-4">
-        <p class="text-center text-xl">Institute Management System</p><br>
-        <?php if ($error): ?><p class="text-red-500 mb-2"><?= $error ?></p><?php endif; ?>
-        <input type="text" name="username" placeholder=" Username..." required class="border border-teal-700 p-3 w-full mb-9 rounded-full">
-        <input type="password" name="password" placeholder=" Password..." required class="border border-teal-700 p-3 w-full mb-9 rounded-full">
-        <button class="bg-teal-600 text-white w-[170px] p-3 rounded-full m-auto block"><i class="fa-solid fa-right-from-bracket"></i> Login</button>
-    </form>
+            <img src="../pic/logo.jpg" alt="logo" class="w-20 block m-auto mb-4">
+            <p class="text-center text-xl">Institute Management System</p><br>
+            
+            <?php if ($error): ?>
+                <p class="text-red-500 mb-2"><?= $error ?></p>
+            <?php endif; ?>
+            
+            <input type="text" name="username" placeholder=" Username..." required class="border border-teal-700 p-3 w-full mb-6 rounded-full">
+            
+            <input type="password" name="password" placeholder=" Password..." required class="border border-teal-700 p-3 w-full mb-6 rounded-full">
+            
+            <!-- ✅ Role selector -->
+            <select name="role" required class="border border-teal-700 p-3 w-full mb-6 rounded-full text-gray-700">
+                <option value="">Select Role...</option>
+                <option value="admin">Admin</option>
+                <option value="staff">Staff</option>
+            </select>
+
+            <button class="bg-teal-600 text-white w-[170px] p-3 rounded-full m-auto block">
+                <i class="fa-solid fa-right-from-bracket"></i> Login
+            </button>
+        </form>
     </div>
-    
 </body>
+
 </html>

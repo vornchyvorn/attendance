@@ -1,23 +1,29 @@
 <?php
 session_start();
+
 include '../db/conn.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: login_admin.php');
     exit();
 }
 
-$admin_id = $_SESSION['user_id'];
-$sql = "SELECT * FROM users WHERE id = ?";
+$admin_id = $_SESSION['admin_id'];
+
+
+$sql = "SELECT * FROM admin WHERE admin_id = ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $admin_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $admin = $result->fetch_assoc();
+$stmt->close();
 
+// ✅ រូបភាព
 $default_img = '../pic/user.png';
 $profile_img = (!empty($admin['image']) && file_exists("../uploads/" . $admin['image']))
-    ? "../uploads/" . $admin['image']
+    ? "../uploads/" . htmlspecialchars($admin['image'])
     : $default_img;
 ?>
 
@@ -138,7 +144,7 @@ $profile_img = (!empty($admin['image']) && file_exists("../uploads/" . $admin['i
     </aside>
 
     <!-- Main content -->
-    <main class="flex-1 ml-0 transition-all duration-300" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
+    <main class="flex-1 ml-0 duration-0" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
         <!-- Top navbar -->
         <div class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
             <button @click="sidebarOpen = !sidebarOpen" class="text-xl text-gray-700 hover:text-blue-500">
@@ -194,20 +200,23 @@ $profile_img = (!empty($admin['image']) && file_exists("../uploads/" . $admin['i
                 <div class="flex-grow grid text-center items-center justify-center gap-6">
                     <div class="flex">
                         <label class="block text-gray-600">ឈ្មោះអ្នកប្រើប្រាស់: </label>
-                        <p class="font-semibold text-gray-800"><?= htmlspecialchars($admin['username']) ?></p>
+                        <p class="font-semibold text-gray-800"><?= htmlspecialchars($admin['username'] ?? '') ?></p>
+
                     </div>
-                    <div class="flex">
-                     <label class="block text-gray-600">ភេទ: </label>
-                        <p class="font-semibold text-gray-800"><?= htmlspecialchars($admin['gender']) ?></p>
-                    </div>
+                    
                     <div class="flex">
                         <label class="block text-gray-600">តួនាទី: </label>
-                        <p class="font-semibold text-gray-800"><?= htmlspecialchars($admin['role']) ?></p>
+                        <p class="font-semibold text-gray-800"><?= htmlspecialchars($admin['role'] ?? '') ?>
                     </div>
                     <div class="flex">
-                        <label class="block text-gray-600">ថ្ងៃខែឆ្នាំកំណើត: </label>
-                        <p class="font-semibold text-gray-800"><?= htmlspecialchars($admin['date']) ?></p>
+                        <label class="block text-gray-600">លេខទូរសព្ទ: </label>
+                        <p class="font-semibold text-gray-800">	<?= htmlspecialchars($admin['phone'] ?? '') ?>
                     </div>
+                    <div class="flex">
+                        <label class="block text-gray-600">អ៊ីម៉ែល: </label>
+                        <p class="font-semibold text-gray-800"><?= htmlspecialchars($admin['email'] ?? '') ?>
+                    </div>
+                    
                 </div>
             </div>
         </div>

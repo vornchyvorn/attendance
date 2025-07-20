@@ -1,12 +1,13 @@
 <?php
 session_start();
 include '../db/conn.php';
-$profile_img = '../pic/user.png'; 
-$user_id = $_SESSION['user_id'] ?? 0;
 
-if ($user_id) {
-    $stmt = $conn->prepare("SELECT image FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
+$profile_img = '../pic/user.png'; 
+$admin_id = $_SESSION['admin_id'] ?? 0;
+
+if ($admin_id) {
+    $stmt = $conn->prepare("SELECT image FROM admin WHERE admin_id = ?");
+    $stmt->bind_param("i", $admin_id);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($row = $result->fetch_assoc()) {
@@ -19,73 +20,68 @@ if ($user_id) {
 
 $error = '';
 $success = '';
+$image_new = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize inputs
     $student_id = trim($_POST['student_id']);
     $username = trim($_POST['username']);
-    $password_raw = $_POST['password'];
+    $password_raw = trim($_POST['password']);
     $gender = $_POST['gender'];
     $gmail = trim($_POST['gmail']);
     $major = $_POST['major'];
     $date = $_POST['date'];
-    $user_type = $_POST['user_type'];
+    $user_type = $_POST['user_type']; // សិស្ស / គ្រូ
     $address = trim($_POST['address']);
 
-    // Handle image upload info
+    // Image upload settings
     $image = $_FILES['image']['name'];
     $image_tmp = $_FILES['image']['tmp_name'];
     $image_size = $_FILES['image']['size'];
+    $ext = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+    $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
     $upload_dir = 'upload_img/';
+    $image_new = uniqid('user_', true) . '.' . $ext;
+    $image_path = $upload_dir . $image_new;
 
-    // Validate image size (max 2MB)
-    if ($image_size > 2 * 1024 * 1024) {
-        $error = "Image size too large. Maximum 2MB allowed.";
-    } elseif (!in_array(pathinfo($image, PATHINFO_EXTENSION), ['jpg', 'jpeg', 'png', 'gif'])) {
-        $error = "Invalid image format. Allowed: jpg, jpeg, png, gif.";
-    } else {
-        // Check if student_id exists
-        $stmt_check = $conn->prepare("SELECT student_id FROM users WHERE student_id = ?");
-        $stmt_check->bind_param("s", $student_id);
-        $stmt_check->execute();
-        $stmt_check->store_result();
+    // Check duplicate student_id
+    $stmt_check = $conn->prepare("SELECT id FROM users WHERE student_id = ?");
+    $stmt_check->bind_param("s", $student_id);
+    $stmt_check->execute();
+    $stmt_check->store_result();
 
-        if ($stmt_check->num_rows > 0) {
-            $error = "Student ID already exists.";
-        }
-        $stmt_check->close();
+    if ($stmt_check->num_rows > 0) {
+        $error = "អត្តលេខសិស្សនេះមានរួចហើយ។";
     }
+    $stmt_check->close();
 
     if (!$error) {
-       
-        $image_new_name = uniqid('user_', true) . '.' . pathinfo($image, PATHINFO_EXTENSION);
-        $image_path = $upload_dir . $image_new_name;
-
-        if (move_uploaded_file($image_tmp, $image_path)) {
-           
+        if (!in_array($ext, $allowed_ext)) {
+            $error = "ប្រភេទរូបភាពមិនត្រឹមត្រូវ។";
+        } elseif ($image_size > 2 * 1024 * 1024) {
+            $error = "រូបភាពត្រូវតែតិចជាង 2MB។";
+        } elseif (!move_uploaded_file($image_tmp, $image_path)) {
+            $error = "ផ្ទុករូបភាពបរាជ័យ។";
+        } else {
             $password = password_hash($password_raw, PASSWORD_DEFAULT);
-
-           
-            $stmt = $conn->prepare("INSERT INTO users (student_id, username, password, gender, gmail, major, date, user_type, address, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssssss", $student_id, $username, $password, $gender, $gmail, $major, $date, $user_type, $address, $image_new_name);
+            $stmt = $conn->prepare(
+                "INSERT INTO users (student_id, username, password, gender, gmail, major, date, user_type, address, image)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+            $stmt->bind_param("ssssssssss", $student_id, $username, $password, $gender, $gmail, $major, $date, $user_type, $address, $image_new);
 
             if ($stmt->execute()) {
-                $success = "User registered successfully!";
-             
+                $success = "✅ ចុះឈ្មោះបានជោគជ័យ។";
             } else {
-                $error = "Failed to register user: " . $stmt->error;
-           
+                $error = "❌ បញ្ចូលទិន្នន័យបរាជ័យ: " . $stmt->error;
                 if (file_exists($image_path)) unlink($image_path);
             }
+            
             $stmt->close();
-        } else {
-            $error = "Failed to upload image.";
         }
-        
-
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -177,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 <!-- Main content -->
-<main class="flex-1 ml-0 transition-all duration-300" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
+<main class="flex-1 ml-0 duration-0" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
     <!-- Top navbar -->
     <div class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
         <button @click="sidebarOpen = !sidebarOpen" class="text-xl text-gray-700 hover:text-blue-500">

@@ -2,23 +2,22 @@
 session_start();
 include '../db/conn.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: login_admin.php');
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../admin/login_admin.php');
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
 
-// Get counts
 $user_count = $conn->query("SELECT COUNT(*) AS total FROM users")->fetch_assoc()['total'];
 $event_count = $conn->query("SELECT COUNT(*) AS total FROM events")->fetch_assoc()['total'];
 $attendance_count = $conn->query("SELECT COUNT(*) AS total FROM attendance")->fetch_assoc()['total'];
 $announcement_count = $conn->query("SELECT COUNT(*) AS total FROM announcements")->fetch_assoc()['total'];
 
-// Get profile image
-$profile_img = '../pic/user.png'; // fallback
-$stmt = $conn->prepare("SELECT image FROM users WHERE id = ?");
-$stmt->bind_param("i", $user_id);
+$profile_img = '../pic/user.png'; 
+$admin_id = $_SESSION['admin_id'];
+
+$stmt = $conn->prepare("SELECT image FROM admin WHERE admin_id = ?");
+$stmt->bind_param("i", $admin_id);
 $stmt->execute();
 $result = $stmt->get_result();
 if ($row = $result->fetch_assoc()) {
@@ -26,11 +25,12 @@ if ($row = $result->fetch_assoc()) {
         $profile_img = "../uploads/" . $row['image'];
     }
 }
+$stmt->close();
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,7 +49,7 @@ if ($row = $result->fetch_assoc()) {
     </style>
 </head>
 
-<body class="bg-gray-100 text-gray-800  flex" x-data="{ sidebarOpen: true }">
+<body class="bg-gray-100 text-gray-800 flex" x-data="{ sidebarOpen: true }">
 
     <!-- Sidebar -->
     <aside :class="sidebarOpen ? 'w-64' : 'w-0', sidebarOpen ? 'p-4' : 'p-0'"
@@ -124,6 +124,21 @@ if ($row = $result->fetch_assoc()) {
                                 class="fa-regular fa-circle"></i>បញ្ជីវត្តមានអ្នកចូលរួម</a></li>
                 </ul>
             </li>
+             <li x-data="{ open: false }">
+                <button @click="open=!open"
+                    class="w-full flex justify-between items-center px-3 py-4 hover:bg-gray-700">
+                    <span class="flex items-center gap-3"><i 
+                    class="fa-solid fa-people-roof"></i>បុគ្គលិក</span>
+                    <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
+                </button>
+                 <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-sm dropdown-menu">
+                    <li><a href="../admin/add_staff.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
+                                class="fa-regular fa-circle"></i> ចុះឈ្មោះបុគ្គលិក</a></li>
+                    <li><a href="../admin/manage_staff.php"
+                            class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
+                                class="fa-regular fa-circle"></i> គ្រប់គ្រងបុគ្គលិក</a></li>
+                </ul>
+            </li>
 
             <!-- Announcements Dropdown -->
             <li x-data="{ open: false }">
@@ -145,9 +160,9 @@ if ($row = $result->fetch_assoc()) {
     </aside>
 
     <!-- Main content -->
-    <main class="flex-1 ml-0 transition-all duration-300" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
+    <main class="flex-1 ml-0 duration-0" :class="sidebarOpen ? 'ml-64' : 'ml-0'">
         <!-- Top navbar -->
-        <div class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
+        <div class="bg-white border-b p-4 flex justify-between  items-center sticky top-0 z-100 ">
             <button @click="sidebarOpen = !sidebarOpen" class="text-xl text-gray-700 hover:text-blue-500">
                 <i :class="sidebarOpen ? 'fa-bars' : 'fa-bars'" class="fa-solid"></i>
             </button>
@@ -175,7 +190,7 @@ if ($row = $result->fetch_assoc()) {
         </div>
 
         <!-- Values -->
-        <section class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <section class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ">
             <div class="bg-white rounded-xl shadow hover:shadow-md transition flex flex-col justify-between h-full overflow-hidden">
                 <div class="flex items-center gap-4 p-6">
                     <i class="fa-solid fa-users text-white bg-sky-600 p-3 rounded-full"></i>
@@ -231,6 +246,7 @@ if ($row = $result->fetch_assoc()) {
             </div>
         </section>
     </main>
+    
 
 </body>
 

@@ -1,23 +1,24 @@
 <?php
 include '../db/conn.php';
 
-// សរុបអ្នកប្រើ role user
-$total_result = $conn->query("SELECT COUNT(*) AS total FROM users WHERE role = 'user'");
+// សរុបអ្នកប្រើ
+$total_result = $conn->query("SELECT COUNT(*) AS total FROM users");
 $total = $total_result->fetch_assoc()['total'];
 
 // សរុបស្រី
-$female_result = $conn->query("SELECT COUNT(*) AS female FROM users WHERE role = 'user' AND gender = 'ស្រី'");
+$female_result = $conn->query("SELECT COUNT(*) AS female FROM users WHERE gender = 'ស្រី'");
 $female = $female_result->fetch_assoc()['female'];
 
 // សរុបគ្រូ
-$teacher_result = $conn->query("SELECT COUNT(*) AS teacher FROM users WHERE role = 'user' AND user_type = 'គ្រូ'");
+$teacher_result = $conn->query("SELECT COUNT(*) AS teacher FROM users WHERE user_type = 'គ្រូ'");
 $teacher = $teacher_result->fetch_assoc()['teacher'];
 
 // សរុបសិស្ស
-$student_result = $conn->query("SELECT COUNT(*) AS student FROM users WHERE role = 'user' AND user_type = 'សិស្ស'");
+$student_result = $conn->query("SELECT COUNT(*) AS student FROM users WHERE user_type = 'សិស្ស'");
 $student = $student_result->fetch_assoc()['student'];
 
-$sql = "SELECT * FROM users WHERE role = 'user'";
+// ទាញទិន្នន័យអ្នកប្រើទាំងអស់
+$sql = "SELECT * FROM users";
 $result = $conn->query($sql);
 ?>
 

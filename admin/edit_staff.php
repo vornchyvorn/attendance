@@ -1,5 +1,5 @@
 
-<?php
+<?php  
 session_start();
 include '../db/conn.php';
 
@@ -222,8 +222,8 @@ $result = $conn->query("SELECT * FROM admin WHERE role IN ('admin', 'staff') ORD
           <div class="bg-white p-6 rounded-lg w-full max-w-2xl relative shadow-lg">
             <h2 class="text-xl font-semibold mb-4">កែសម្រួលអ្នកប្រើ</h2>
 
-            <form method="POST" action="edit_staff.php">
-              <input type="hidden" name="id" x-model="editStaff.id" />
+            <form method="POST" action="update_user.php">
+              <input type="hidden" name="id" x-model="editUser.id" />
 
               <!-- ចាប់ផ្តើមជួរពីរជួរ -->
               <div class="grid grid-cols-2 gap-4">

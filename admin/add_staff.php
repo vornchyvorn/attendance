@@ -3,11 +3,11 @@ session_start();
 include '../db/conn.php';
 
 $profile_img = '../pic/user.png';
-$user_id = $_SESSION['user_id'] ?? 0;
+$admin_id = $_SESSION['admin_id'] ?? 0;
 
-if ($user_id) {
-  $stmt = $conn->prepare("SELECT image FROM admin WHERE id = ?");
-  $stmt->bind_param("i", $user_id);
+if ($admin_id) {
+  $stmt = $conn->prepare("SELECT image FROM admin WHERE admin_id = ?");
+  $stmt->bind_param("i", $admin_id);
   $stmt->execute();
   $result = $stmt->get_result();
   if ($row = $result->fetch_assoc()) {
@@ -17,7 +17,6 @@ if ($user_id) {
   }
   $stmt->close();
 }
-
 $error = '';
 $success = '';
 
@@ -35,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $image_tmp = $_FILES['image']['tmp_name'];
   $image_size = $_FILES['image']['size'];
   $upload_dir = '../upload_img/';
-  
+
 
   // Validation
   if ($image_size > 2 * 1024 * 1024) {
@@ -214,16 +213,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
     <section>
-      <div class="flex justify-center items-center min-h-screen bg-white p-4">
-        <div class="bg-white rounded-lg p-6 w-full sm:w-[80%] shadow-lg">
+      <div class="flex justify-center items-center min-h-screen p-4">
+        <div class="rounded-lg p-6 w-full sm:w-[80%]">
           <?php if ($error): ?>
             <p class="text-red-500 text-center mb-4"><?= htmlspecialchars($error) ?></p>
           <?php elseif ($success): ?>
             <p class="text-green-500 text-center mb-4"><?= htmlspecialchars($success) ?></p>
           <?php endif; ?>
 
-          <form method="POST" enctype="multipart/form-data"
-            class="max-w-lg mx-auto p-6 bg-white rounded shadow-md space-y-6">
+          <form method="POST" enctype="multipart/form-data" class="max-w-lg mx-auto p-6 bg-white rounded shadow-md space-y-6">
             <div>
               <label for="username" class="block mb-2 font-semibold text-gray-700">ឈ្មោះអ្នកប្រើ</label>
               <input id="username" name="username" type="text" required
@@ -238,31 +236,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <!-- Role -->
-<div>
-  <label for="role" class="block mb-2 font-semibold text-gray-700">តួនាទី</label>
-  <select id="role" name="role" required
-    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
-    <option value="">ជ្រើសរើសតួនាទី</option>
-    <option value="admin" <?= (isset($_POST['role']) && $_POST['role'] == 'admin') ? 'selected' : '' ?>>Admin</option>
-    <option value="staff" <?= (isset($_POST['role']) && $_POST['role'] == 'staff') ? 'selected' : '' ?>>Staff</option>
-  </select>
-</div>
+            <div>
+              <label for="role" class="block mb-2 font-semibold text-gray-700">តួនាទី</label>
+              <select id="role" name="role" required
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option value="">ជ្រើសរើសតួនាទី</option>
+                <option value="admin" <?= (isset($_POST['role']) && $_POST['role'] == 'admin') ? 'selected' : '' ?>>Admin
+                </option>
+                <option value="staff" <?= (isset($_POST['role']) && $_POST['role'] == 'staff') ? 'selected' : '' ?>>Staff
+                </option>
+              </select>
+            </div>
 
-<!-- Phone -->
-<div>
-  <label for="phone" class="block mb-2 font-semibold text-gray-700">លេខទូរស័ព្ទ</label>
-  <input id="phone" name="phone" type="text" required
-    value="<?= isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : '' ?>"
-    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" />
-</div>
+            <!-- Phone -->
+            <div>
+              <label for="phone" class="block mb-2 font-semibold text-gray-700">លេខទូរស័ព្ទ</label>
+              <input id="phone" name="phone" type="text" required
+                value="<?= isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : '' ?>"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
 
-<!-- Gmail -->
-<div>
-  <label for="email" class="block mb-2 font-semibold text-gray-700">អ៊ីមែល</label>
-  <input id="email" name="email" type="email" required
-    value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
-    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" />
-</div>
+            <!-- Gmail -->
+            <div>
+              <label for="email" class="block mb-2 font-semibold text-gray-700">អ៊ីមែល</label>
+              <input id="email" name="email" type="email" required
+                value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
 
 
             <div>
@@ -277,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <a href="manage_users.php"
                 class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow transition">Cancel</a>
             </div>
-          
+
           </form>
 
         </div>

@@ -180,6 +180,7 @@ $result = $conn->query($sql);
                 <td class="border px-4 py-2"><?= date('d-m-Y', strtotime($row['event_date'])) ?></td>
                 <td class="border px-4 py-2"><?= date('g:i A', strtotime($row['event_start'])) ?></td>
                 <td class="border px-4 py-2"><?= date('g:i A', strtotime($row['event_end'])) ?></td>
+
                 <td class="border px-4 py-2"><?= htmlspecialchars($row['location']) ?></td>
                 <td class="border px-4 py-2"><?= htmlspecialchars($row['description']) ?></td>
                 <td class="border px-4 py-2 whitespace-nowrap">

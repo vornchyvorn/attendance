@@ -35,15 +35,15 @@ if (!$event_result) {
 <body class="bg-blue-50 min-h-screen flex flex-col">
 
 <!-- Header -->
-<header class="bg-teal-600 sticky top-0 z-50 shadow">
+<header class="bg-sky-600 sticky top-0 z-50 shadow">
   <nav class="flex items-center justify-between px-4 py-3 md:py-4 md:px-8 max-w-screen-xl mx-auto">
     <!-- Logo -->
     <div class="flex items-center space-x-2">
-      <img src="../pic/logo.jpg" alt="Logo" class="w-[58px] h-[58px] rounded-full" />
+      <img src="../pic/logo.jpg" alt="Logo" class="w-[58px] h-[58px] rounded-full"/>
     </div>
 
     <!-- Desktop Menu -->
-    <ul class="hidden md:flex items-center space-x-16 text-white text-md font-medium">
+    <ul class="hidden md:flex items-center space-x-16 text-white text-lg font-medium">
       <li><a href="dashboard.php" class="hover:text-gray-300">ទំព័រដើម</a></li>
       <li><a href="announcements.php" class="hover:text-gray-300">ប្រកាស</a></li>
       <li><a href="participants.php" class="hover:text-gray-300">អ្នកចូលរួម</a></li>
@@ -54,13 +54,15 @@ if (!$event_result) {
     <div class="flex items-center space-x-3 md:space-x-4">
       <!-- Profile Button -->
       <div class="relative">
-       <button onclick="toggleDropdown()" class="bg-amber-400 text-white px-3 py-1 text-sm h-[40px] rounded-full hover:bg-amber-500">
+       <button onclick="toggleDropdown()" class="bg-blue-400 text-white px-6 py-1 text-sm h-[40px] rounded-full hover:bg-blue-500 shadow-md">
           My Profile
         </button>
         <ul id="dropdownMenu" class="absolute right-0 mt-2 bg-white text-black shadow-lg rounded hidden z-10 w-40 text-sm">
-          <li><a href="user_profile.php" class="block px-4 py-2 hover:bg-gray-100">User Profile</a></li>
-          <li><hr class="border-gray-200"></li>
-          <li><a href="login.php" class="block px-4 py-2 hover:bg-gray-100">Log out</a></li>
+            <li><a href="user_profile.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fa-solid fa-id-badge mr-2"></i> ព័ត៌មានគណនី</a></li>
+            <li>
+              <hr class="border-gray-200">
+            </li>
+            <li><a href="login.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-100""><i class="fa-solid fa-sign-out-alt mr-2"></i> ចាកចេញ</a></li>
         </ul>
       </div>
 
@@ -72,7 +74,7 @@ if (!$event_result) {
   </nav>
 
   <!-- Mobile Menu -->
-  <div id="mobileMenu" class="md:hidden hidden bg-teal-600 px-6 pb-3 text-white text-base font-medium">
+  <div id="mobileMenu" class="md:hidden hidden bg-sky-600 px-6 pb-3 text-white text-base font-medium">
     <a href="dashboard.php" class="block py-2 border-b border-white/20">ទំព័រដើម</a>
     <a href="announcements.php" class="block py-2 border-b border-white/20">ប្រកាស</a>
     <a href="participants.php" class="block py-2 border-b border-white/20">អ្នកចូលរួម</a>
@@ -83,10 +85,11 @@ if (!$event_result) {
 
 <!-- Title -->
 <main class="flex-grow">
-<div class="text-center mt-6 mb-4">
-  <h2 class="text-xl font-bold text-sky-700 relative inline-block pb-1 after:block after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-sky-700">
+ <div class="text-center mt-6 mb-4">
+  <button class="relative text-xl font-bold text-sky-700 px-6 py-2 border border-sky-700 rounded hover:text-white z-10 transition duration-300 after:content-[''] after:block after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-sky-700">
     សេចក្ដីប្រកាស
-  </h2>
+</button>
+
 </div>
 
 
@@ -122,7 +125,7 @@ if (!$event_result) {
 </div>
 </main>
 <!-- Footer -->
-<div class="bg-teal-600 text-white text-center py-8">
+<div class="bg-sky-600 text-white text-center py-8">
     Power by Department of Computer Science @2025
 </div>
 

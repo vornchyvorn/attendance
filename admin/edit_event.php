@@ -1,27 +1,22 @@
 <?php
 session_start();
 include '../db/conn.php';
-
-// Check if admin is logged in
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login_admin.php"); 
+if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login_admin.php");
     exit();
 }
-
 // Check if form was submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get and sanitize inputs
     $id = intval($_POST['id']);
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $event_date = $_POST['event_date'];
-    $event_start = $_POST['event_start'];
-    $event_end = $_POST['event_end'];
+    $start_time = $_POST['event_start'];
+    $end_time   = $_POST['event_end'];
     $location = trim($_POST['location']);
 
-    // Prepare and execute update
     $stmt = $conn->prepare("UPDATE events SET title=?, description=?, event_date=?, event_start=?, event_end=?, location=? WHERE id=?");
-    $stmt->bind_param("ssssssi", $title, $description, $event_date, $event_start, $event_end, $location, $id);
+    $stmt->bind_param("ssssssi", $title, $description, $event_date, $start_time, $end_time, $location, $id);
 
     if ($stmt->execute()) {
         // Redirect back to event list

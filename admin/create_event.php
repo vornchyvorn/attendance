@@ -16,26 +16,25 @@ if ($admin_id) {
     }
     $stmt->close();
 }
+
 if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: ../admin/login_admin.php');
     exit();
 }
 
-
-// Insert event when submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title    = $_POST['title'];
-    $desc     = $_POST['description'];
-    $date     = $_POST['event_date'];
-    $time     = $_POST['event_start'];
-    $time     = $_POST['event_end'];
-    $location = $_POST['location'];
+    $title      = $_POST['title'];
+    $desc       = $_POST['description'];
+    $date       = $_POST['event_date'];
+    $start_time = $_POST['event_start'];
+    $end_time   = $_POST['event_end'];
+    $location   = $_POST['location'];
 
     $sql = "INSERT INTO events (title, description, event_date, event_start, event_end, location) 
             VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssss", $title, $desc, $date, $time, $time, $location);
-    
+    $stmt->bind_param("ssssss", $title, $desc, $date, $start_time, $end_time, $location);
+
     if ($stmt->execute()) {
         header("Location: events_list.php?success=1");
         exit();
@@ -44,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

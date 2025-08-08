@@ -15,7 +15,7 @@ if (!isset($_POST['id'])) {
 
 $user_id = intval($_POST['id']);
 
-// ✅ Get old image before delete
+
 $sql = "SELECT image FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
@@ -29,13 +29,12 @@ if ($row = $result->fetch_assoc()) {
     }
 }
 
-// ✅ Delete user
 $delete = "DELETE FROM users WHERE id = ?";
 $stmt = $conn->prepare($delete);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 
-// ✅ Redirect back
+
 header("Location: manage_users.php?deleted=1");
 exit();
 ?>

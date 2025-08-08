@@ -27,10 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password_raw = trim($_POST['password']);
     $gender = $_POST['gender'];
+    $Education_level = $_POST['Education_level'];
+    $school_year = $_POST['school_year'];
     $gmail = trim($_POST['gmail']);
     $major = $_POST['major'];
     $date = $_POST['date'];
-    $user_type = $_POST['user_type']; // សិស្ស / គ្រូ
+    $user_type = $_POST['user_type']; 
+    $phone = $_POST['phone'];
     $address = trim($_POST['address']);
 
     // Image upload settings
@@ -64,10 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $password = password_hash($password_raw, PASSWORD_DEFAULT);
             $stmt = $conn->prepare(
-                "INSERT INTO users (student_id, username, password, gender, gmail, major, date, user_type, address, image)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                "INSERT INTO users (student_id, username, password, gender, Education_level, school_year, gmail, major, date, user_type, phone, address, image)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?)"
             );
-            $stmt->bind_param("ssssssssss", $student_id, $username, $password, $gender, $gmail, $major, $date, $user_type, $address, $image_new);
+            $stmt->bind_param("sssssssssssss", $student_id, $username, $password, $gender, $Education_level, $school_year, $gmail, $major, $date, $user_type, $phone, $address, $image_new);
 
             if ($stmt->execute()) {
                 $success = "✅ ចុះឈ្មោះបានជោគជ័យ។";
@@ -114,12 +117,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- User Dropdown -->
         <li x-data="{ open: false }">
             <button @click="open=!open" class="w-full flex justify-between items-center px-3 py-4 hover:bg-gray-700">
-                <span class="flex items-center gap-3"><i class="fa-solid fa-user"></i> សិស្សចុះឈ្មោះ</span>
+                <span class="flex items-center gap-3"><i class="fa-solid fa-user"></i>ទិន្នន័យអ្នកប្រើប្រាស់</span>
                 <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
             </button>
             <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-sm dropdown-menu">
                 <li><a href="../admin/add_user.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i class="fa-regular fa-circle"></i> ចុះឈ្មោះថ្មី</a></li>
-                <li><a href="../admin/manage_users.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i class="fa-regular fa-circle"></i> គ្រប់គ្រងសិស្ស</a></li>
+                <li><a href="../admin/manage_users.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i class="fa-regular fa-circle"></i> គ្រប់គ្រងអ្នកប្រើប្រាស់</a></li>
             </ul>
         </li>
 
@@ -232,6 +235,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <option value="ស្រី" <?= (isset($_POST['gender']) && $_POST['gender'] === 'ស្រី') ? 'selected' : '' ?>>ស្រី</option>
           </select>
         </div>
+        <div>
+          <label class="block mb-1 font-semibold">កម្រិតវប្បធម៍</label>
+          <select name="Education_level" required class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">កម្រិតវប្បធម៍</option>
+            <option value="បរិញ្ញាបត្រ" <?= (isset($_POST['Education_level']) && $_POST['Education_level'] === 'បរិញ្ញាបត្រ') ? 'selected' : '' ?>>បរិញ្ញាបត្រ</option>
+            <option value="បរិញ្ញាបត្ររង" <?= (isset($_POST['Education_level']) && $_POST['Education_level'] === 'បរិញ្ញាបត្ររង') ? 'selected' : '' ?>>បរិញ្ញាបត្ររង</option>
+            <option value="9+3" <?= (isset($_POST['Education_level']) && $_POST['Education_level'] === '9+3') ? 'selected' : '' ?>>9+3</option>
+          </select>
+        </div>
+
+        
+        <div>
+          <label class="block mb-1 font-semibold">ឆ្នាំសិក្សា</label>
+          <select name="school_year" required class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">ជ្រើសរើសឆ្នាំសិក្សា</option>
+            <option value="1" <?= (isset($_POST['school_year']) && $_POST['school_year'] === '1') ? 'selected' : '' ?>>1</option>
+            <option value="2" <?= (isset($_POST['school_year']) && $_POST['school_year'] === '2') ? 'selected' : '' ?>>2</option>
+            <option value="3" <?= (isset($_POST['school_year']) && $_POST['school_year'] === '3') ? 'selected' : '' ?>>3</option>
+            <option value="4" <?= (isset($_POST['school_year']) && $_POST['school_year'] === '4') ? 'selected' : '' ?>>4</option>
+          </select>
+        </div>
 
         <div>
           <label class="block mb-1 font-semibold">អុីម៉ែល</label>
@@ -266,6 +290,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <option value="សិស្ស" <?= (isset($_POST['user_type']) && $_POST['user_type'] === 'សិស្ស') ? 'selected' : '' ?>>សិស្ស</option>
           </select>
         </div>
+        <div class="sm:col-span-2">
+          <label class="block mb-1 font-semibold">លេទទូរសព្ទ</label>
+          <input name="phone" required class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"><?= isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : '' ?></input>
+        </div>
 
         <div class="sm:col-span-2">
           <label class="block mb-1 font-semibold">អាសយដ្ឋាន</label>
@@ -278,8 +306,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="sm:col-span-2 flex justify-end gap-4 mt-4">
-          <button type="submit" class="bg-teal-600 text-white px-6 py-2 rounded shadow">Add</button>
-          <a href="manage_users.php" class="bg-red-600 text-white px-6 py-2 rounded shadow">Cancel</a>
+          <a href="manage_users.php" class="bg-red-600 text-white px-6 py-2 rounded shadow">បោះបង់</a>
+          <button type="submit" class="bg-teal-600 text-white px-6 py-2 rounded shadow">បង្កើត</button>
+          
         </div>
       </form>
     </div>

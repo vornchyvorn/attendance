@@ -22,7 +22,7 @@ unset($_SESSION['message']);
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
     body {
-      font-family: "Khmer OS Siemreap", sans-serif;
+      font-family: "Koulen", sans-serif;
     }
   </style>
 </head>
@@ -33,9 +33,8 @@ unset($_SESSION['message']);
     <nav class="flex items-center justify-between px-4 py-3 md:py-4 md:px-8 max-w-screen-xl mx-auto">
       <!-- Logo -->
       <div class="flex items-center space-x-2">
-        <img src="../pic/logo.jpg" alt="Logo" class="w-[58px] h-[58px] rounded-full"/>
+        <img src="../pic/logo.jpg" alt="Logo" class="w-[58px] h-[58px] rounded"/>
       </div>
-
       <!-- Desktop Menu -->
       <ul class="hidden md:flex items-center space-x-16 text-white text-lg font-medium">
         <li><a href="dashboard.php" class="hover:text-gray-300">ទំព័រដើម</a></li>
@@ -176,7 +175,7 @@ unset($_SESSION['message']);
       ?>
       <!-- Table -->
       <div class="overflow-x-auto px-4">
-        <table class="min-w-full text-sm border border-gray-300 rounded-md text-center shadow-sm">
+        <table class="min-w-full text- border border-gray-300 rounded-md text-center shadow-sm">
           <thead class="bg-sky-600 text-white">
             <tr>
               <th class="p-3 border">ថ្ងៃ</th>

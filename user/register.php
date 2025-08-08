@@ -10,10 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $gender = $_POST['gender'];
+    $Education_level = $_POST['Education_level'];
+    $school_year = $_POST['school_year'];
     $gmail = $_POST['gmail'];
     $major = $_POST['major'];
     $date = $_POST['date'];
-    $user_type = $_POST['user_type']; // 'teacher' or 'student'
+    $user_type = $_POST['user_type'];
+    $phone = $_POST['phone'];
     $address = $_POST['address'];
 
     // Image handling
@@ -39,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$error) {
         if (!in_array($ext, $allowed_ext)) {
             $error = "ប្រភេទរូបភាពមិនត្រឹមត្រូវ។";
-        } elseif ($image_size > 2 * 1024 * 1024) {
+        } elseif ($image_size > 5 * 1024 * 1024) {
             $error = "ទំហំរូបភាពធំជាងកំណត់ (2MB)";
         } elseif (!move_uploaded_file($image_tmp, $image_path)) {
             $error = "ការផ្ទុករូបភាពបរាជ័យ។";
@@ -49,17 +52,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Insert into DB
     if (!$error) {
         $stmt = $conn->prepare(
-            "INSERT INTO users (student_id, username, password, gender, gmail, major, date, user_type, address, image)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO users (student_id, username, password, gender, Education_level, school_year, gmail, major, date, user_type, address, phone, image)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("ssssssssss", $student_id, $username, $password, $gender, $gmail, $major, $date, $user_type, $address, $image_new);
+        $stmt->bind_param("sssssssssssss", $student_id, $username, $password, $gender, $Education_level, $school_year, $gmail, $major, $date, $user_type, $address, $phone, $image_new);
 
         if ($stmt->execute()) {
-            $success = "ចុះឈ្មោះជោគជ័យ! សូមចូលប្រើប្រព័ន្ធ។";
+            // ✅ Redirect to login.php after success
+            header("Location: login.php?register=success");
+            exit();
         } else {
-            $error = "បរាជ័យក្នុងការចុះឈ្មោះ។";
-            if (file_exists($image_path)) unlink($image_path);
+            echo "<p class='text-red-600'>មានបញ្ហាក្នុងការចុះឈ្មោះ!</p>";
         }
+
         $stmt->close();
     }
 }
@@ -67,8 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="km">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link href="../dist/style.css" rel="stylesheet">
     <style>
@@ -77,60 +84,149 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
 </head>
-<body class="bg-gradient-to-r from-emerald-500 to-emerald-900 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full bg-white p-6 rounded shadow">
-        <h2 class="text-xl font-bold text-center text-teal-700 mb-4">បង្កើតគណនី</h2>
+
+<body class="bg-gradient-to-r from-emerald-500 to-emerald-900 min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-4xl bg-white p-6 md:p-8 rounded-xl shadow-lg">
+        <h2 class="text-2xl md:text-3xl font-bold text-center text-teal-700 mb-6">បង្កើតគណនី</h2>
+
         <?php if ($error): ?>
-            <div class="bg-red-500 text-white p-2 mb-2 text-center"><?= $error ?></div>
+            <div class="bg-red-500 text-white p-2 mb-3 text-center rounded"><?= $error ?></div>
         <?php endif; ?>
         <?php if ($success): ?>
-            <div class="bg-green-500 text-white p-2 mb-2 text-center"><?= $success ?></div>
+            <div class="bg-green-500 text-white p-2 mb-3 text-center rounded"><?= $success ?></div>
         <?php endif; ?>
-
-        <form method="post" enctype="multipart/form-data">
-            <input type="text" name="username" placeholder="ឈ្មោះ" required class="w-full mb-2 p-2 border border-teal-600 rounded">
-            <input type="text" name="student_id" placeholder="អត្តលេខ" required class="w-full mb-2 p-2 border border-teal-600 rounded">
-
-            <div class="relative">
-                <input type="password" name="password" id="password" placeholder="ពាក្យសម្ងាត់" required class="w-full mb-2 p-2 border border-teal-600 rounded">
-                <img src="../pic/close.png" id="eyeicon" class="w-6 absolute right-2 top-3 cursor-pointer">
+        <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Username -->
+            <div>
+                <label for="username" class="block mb-1 text-teal-700 font-semibold">ឈ្មោះ</label>
+                <input type="text" id="username" name="username" placeholder="បញ្ជូលឈ្មោះ" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
             </div>
 
-            <select name="gender" required class="w-full mb-2 p-2 border border-teal-600 rounded">
-                <option value="">ជ្រើសរើសភេទ</option>
-                <option value="ប្រុស">ប្រុស</option>
-                <option value="ស្រី">ស្រី</option>
-            </select>
+            <!-- Student ID -->
+            <div>
+                <label for="student_id" class="block mb-1 text-teal-700 font-semibold">អត្តលេខសិស្ស</label>
+                <input type="text" id="student_id" name="student_id" placeholder="បញ្ជូលអត្តលេខ" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
+            </div>
 
-            <input type="email" name="gmail" placeholder="អ៊ីមែល" required class="w-full mb-2 p-2 border border-teal-600 rounded">
+            <!-- Password -->
+            <div class="relative col-span-1 md:col-span-2">
+                <label for="password" class="block mb-1 text-teal-700 font-semibold">ពាក្យសម្ងាត់</label>
+                <input type="password" id="password" name="password" placeholder="បញ្ជូលពាក្យសម្ងាត់" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg pr-12 h-12">
+                <img src="../pic/close.png" id="eyeicon"
+                    class="w-6 absolute right-4 transform -translate-y-1/2 cursor-pointer z-10" style="margin-top: -2rem; ">
+            </div>
 
-            <select name="major" required class="w-full mb-2 p-2 border border-teal-600 rounded">
-                <option value="">ជ្រើសរើសជំនាញ</option>
-                <?php
-                $majors = $conn->query("SELECT major_name FROM majors");
-                while ($row = $majors->fetch_assoc()) {
-                    echo "<option value='{$row['major_name']}'>{$row['major_name']}</option>";
-                }
-                ?>
-            </select>
 
-            <input type="date" name="date" required class="w-full mb-2 p-2 border border-teal-600 rounded">
 
-            <select name="user_type" required class="w-full mb-2 p-2 border border-teal-600 rounded">
-                <option value="">ប្រភេទអ្នកប្រើ</option>
-                <option value="គ្រូ">គ្រូ</option>
-                <option value="សិស្ស">សិស្ស</option>
-            </select>
+            <!-- Gender -->
+            <div>
+                <label for="gender" class="block mb-1 text-teal-700 font-semibold">ភេទ</label>
+                <select id="gender" name="gender" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
+                    <option value="">ជ្រើសរើសភេទ</option>
+                    <option value="ប្រុស">ប្រុស</option>
+                    <option value="ស្រី">ស្រី</option>
+                </select>
+            </div>
 
-            <textarea name="address" placeholder="អាសយដ្ឋាន" required class="w-full mb-2 p-2 border border-teal-600 rounded"></textarea>
+            <!-- Education Level -->
+            <div>
+                <label for="Education_level" class="block mb-1 text-teal-700 font-semibold">កម្រិតវប្បធម៍</label>
+                <select id="Education_level" name="Education_level" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
+                    <option value="">ជ្រើសរើសកម្រិតវប្បធម៍</option>
+                    <option value="បរិញ្ញាបត្រ">បរិញ្ញាបត្រ</option>
+                    <option value="បរិញ្ញាបត្ររង">បរិញ្ញាបត្ររង</option>
+                    <option value="9+3">9+3</option>
+                </select>
+            </div>
 
-            <input type="file" name="image" accept="image/*" required class="w-full mb-2 p-2 border border-teal-600 rounded">
+            <!-- School Year -->
+            <div>
+                <label for="school_year" class="block mb-1 text-teal-700 font-semibold">ឆ្នាំសិក្សា</label>
+                <select id="school_year" name="school_year" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
+                    <option value="">ជ្រើសរើសឆ្នាំ</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
 
-            <div class="flex justify-between items-center">
-                <a href="login.php" class="text-blue-600">ចូលគណនី</a>
-                <button type="submit" class="bg-teal-700 text-white px-4 py-2 rounded">ចុះឈ្មោះ</button>
+            <!-- Email -->
+            <div>
+                <label for="gmail" class="block mb-1 text-teal-700 font-semibold">អ៊ីមែល</label>
+                <input type="email" id="gmail" name="gmail" placeholder="បញ្ជូលអ៊ីមែល" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
+            </div>
+
+            <!-- Major -->
+            <div>
+                <label for="major" class="block mb-1 text-teal-700 font-semibold">ជំនាញ</label>
+                <select id="major" name="major" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
+                    <option value="">ជ្រើសរើសជំនាញ</option>
+                    <?php
+                    $majors = $conn->query("SELECT major_name FROM majors");
+                    while ($row = $majors->fetch_assoc()) {
+                        echo "<option value='{$row['major_name']}'>{$row['major_name']}</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <!-- Date -->
+            <div>
+                <label for="date" class="block mb-1 text-teal-700 font-semibold">ថ្ងៃខែឆ្នាំកំណើត</label>
+                <input type="date" id="date" name="date" required
+                    class="w-full p-3 border border-teal-600 rounded text-base text-black md:text-lg">
+            </div>
+
+            <!-- User Type -->
+            <div>
+                <label for="user_type" class="block mb-1 text-teal-700 font-semibold">ប្រភេទអ្នកប្រើ</label>
+                <select id="user_type" name="user_type" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
+                    <option value="">ជ្រើសរើសប្រភេទ</option>
+                    <option value="គ្រូ">គ្រូ</option>
+                    <option value="សិស្ស">សិស្ស</option>
+                </select>
+            </div>
+
+            <!-- Phone -->
+            <div class="col-span-1 md:col-span-2">
+                <label for="phone" class="block mb-1 text-teal-700 font-semibold">លេខទូរស័ព្ទ</label>
+                <input type="text" id="phone" name="phone" placeholder="បញ្ជូលលេខទូរស័ព្ទ" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
+            </div>
+
+            <!-- Address -->
+
+
+            <!-- Image -->
+            <div class="col-span-1 md:col-span-2">
+                <label for="image" class="block text-teal-700 font-semibold">រូបភាព</label>
+                <input type="file" id="image" name="image" accept="image/*" required
+                    class="w-full p-3 border border-teal-600 rounded">
+            </div>
+            <div class="col-span-1 md:col-span-2">
+                <label for="address" class="block mb-1 text-teal-700 font-semibold">អាសយដ្ឋាន</label>
+                <textarea id="address" name="address" placeholder="បញ្ជូលអាសយដ្ឋាន" required
+                    class="w-full p-3 border border-teal-600 rounded text-base md:text-lg"></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 col-span-1 md:col-span-2 mt-4">
+                <a href=""></a>
+                <button type="submit"
+                    class="bg-teal-700 text-white px-6 py-3 rounded text-base md:text-lg hover:bg-teal-800 transition">ចុះឈ្មោះ</button>
             </div>
         </form>
+
     </div>
 
     <script>
@@ -148,4 +244,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </script>
 </body>
+
 </html>

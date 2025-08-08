@@ -9,7 +9,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = trim($_POST['password']);
     $role = $_POST['role']; 
 
-    // Check that role is valid
     if (!in_array($role, ['admin', 'staff'])) {
         $error = "តួនាទីមិនត្រឹមត្រូវ!";
     } else {
@@ -23,12 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['admin_id'] = $admin['admin_id'];
                 $_SESSION['username'] = $admin['username'];
                 $_SESSION['role'] = $admin['role'];
-
-                // ✅ Extra condition for staff
                 if ($admin['role'] === 'staff') {
                     header("Location: staff_dashboard.php");
                 } else {
-                    header("Location: dashbord.php"); // default for admin
+                    header("Location: dashbord.php"); 
                 }
                 exit;
             } else {
@@ -72,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             
             <input type="password" name="password" placeholder=" Password..." required class="border border-teal-700 p-3 w-full mb-6 rounded-full">
             
-            <!-- ✅ Role selector -->
+            
             <select name="role" required class="border border-teal-700 p-3 w-full mb-6 rounded-full text-gray-700">
                 <option value="">Select Role...</option>
                 <option value="admin">Admin</option>
@@ -85,5 +82,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
     </div>
 </body>
-
 </html>

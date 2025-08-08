@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['student_id'] = $row['student_id'];
             $_SESSION['username'] = $row['username'];
-            $_SESSION['user_type'] = $row['user_type']; // student / teacher
+            $_SESSION['user_type'] = $row['user_type'];
 
             header("Location: dashboard.php");
             exit;

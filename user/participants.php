@@ -33,7 +33,7 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
     <style>
         body {
-            font-family: "Khmer OS Siemreap", sans-serif;
+            font-family: "Koulen", sans-serif;
             background-color: #f0f8ff;
         }
         table.dataTable thead th {
@@ -76,7 +76,7 @@ $result = $conn->query($sql);
   <nav class="flex items-center justify-between px-4 py-3 md:py-4 md:px-8 max-w-screen-xl mx-auto">
     <!-- Logo -->
     <div class="flex items-center space-x-2">
-      <img src="../pic/logo.jpg" alt="Logo" class="w-[58px] h-[58px] rounded-full"/>
+      <img src="../pic/logo.jpg" alt="Logo" class="w-[58px] h-[58px] rounded"/>
     </div>
 
     <!-- Desktop Menu -->
@@ -89,19 +89,21 @@ $result = $conn->query($sql);
 
     <!-- Right Controls -->
     <div class="flex items-center space-x-3 md:space-x-4">
-      <!-- Profile Button -->
-      <div class="relative">
-        <button onclick="toggleDropdown()" class="bg-blue-400 text-white px-6 py-1 text-sm h-[40px] rounded-full hover:bg-blue-500">
-          My Profile
-        </button>
-        <ul id="dropdownMenu" class="absolute right-0 mt-2 bg-white text-black shadow-lg rounded hidden z-10 w-40 text-sm">
-          <li><a href="user_profile.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fa-solid fa-id-badge mr-2"></i> ព័ត៌មានគណនី</a></li>
+        <!-- Profile Button -->
+        <div class="relative">
+          <button onclick="toggleDropdown()"
+            class="bg-blue-400 text-white px-6 py-1 text-sm h-[40px] rounded-full hover:bg-blue-500 shadow-md">
+            My Profile
+          </button>
+          <ul id="dropdownMenu"
+            class="absolute right-0 mt-2 bg-white text-black shadow-lg rounded hidden z-10 w-40 text-sm">
+            <li><a href="user_profile.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fa-solid fa-id-badge mr-2"></i> ព័ត៌មានគណនី</a></li>
             <li>
               <hr class="border-gray-200">
             </li>
             <li><a href="login.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-100""><i class="fa-solid fa-sign-out-alt mr-2"></i> ចាកចេញ</a></li>
-        </ul>
-      </div>
+          </ul>
+        </div>
 
       <!-- Mobile Toggle Button -->
       <button onclick="toggleMobileMenu()" class="md:hidden text-white text-2xl">
@@ -131,11 +133,11 @@ $result = $conn->query($sql);
   <div class="container mx-auto px-4 sm:px-6 lg:px-12">
     <div class="bg-white shadow-md rounded-lg p-4">
       <div class="overflow-x-auto">
-        <table id="exampleid" class="stripe hover cell-border display w-full text-sm text-center min-w-[600px]">
-          <thead class="bg-sky-700 text-white">
+        <table id="exampleid" class="stripe hover cell-border display w-full text-center min-w-[600px]">
+          <thead class="bg-sky-700 text-white text-base">
           <tr>
             <th class="px-4 py-2">ល.រ</th>
-            <th class="px-4 py-2">ថ្ងៃ/ខែ/ឆ្នាំ</th>
+            <th class="px-4 py-2">ថ្ងៃខែឆ្នាំកំណើត</th>
             <th class="px-4 py-2">ឈ្មោះ</th>
             <th class="px-4 py-2">ភេទ</th>
             <th class="px-4 py-2">តួនាទី</th>
@@ -144,7 +146,7 @@ $result = $conn->query($sql);
         <tbody>
           <?php $i = 1; if ($result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): ?>
-              <tr class="hover:bg-gray-50">
+              <tr class="hover:bg-gray-50 text-sm text-gray-400">
                 <td class="px-4 py-2"><?= $i++ ?></td>
                 <td class="px-4 py-2"><?= date("d/m/Y", strtotime($row['date'])) ?></td>
                 <td class="px-4 py-2"><?= htmlspecialchars($row['username']) ?></td>
@@ -197,7 +199,7 @@ $result = $conn->query($sql);
                 previous: "ថយក្រោយ"
             }
         },
-        dom: '<"top flex items-center space-x-2 text-sm"f>rt<"bottom flex justify-between items-center text-xs"lip><"clear">'
+        dom: '<"top-4 flex items-center space-x-2 text-sm"f>rt<"bottom flex justify-between items-center text-xs"lip><"clear">'
     });
 
     let summaryHtml = `

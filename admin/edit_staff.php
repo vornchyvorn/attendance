@@ -69,14 +69,14 @@ $result = $conn->query("SELECT * FROM admin WHERE role IN ('admin', 'staff') ORD
       <!-- User Dropdown -->
       <li x-data="{ open: false }">
         <button @click="open=!open" class="w-full flex justify-between items-center px-3 py-4 hover:bg-gray-700">
-          <span class="flex items-center gap-3"><i class="fa-solid fa-user"></i> សិស្សចុះឈ្មោះ</span>
+          <span class="flex items-center gap-3"><i class="fa-solid fa-user"></i> ចុះឈ្មោះអ្នកប្រើប្រាស់</span>
           <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
         </button>
         <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-sm dropdown-menu">
           <li><a href="../admin/add_user.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
                 class="fa-regular fa-circle"></i> ចុះឈ្មោះថ្មី</a></li>
           <li><a href="../admin/manage_users.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
-                class="fa-regular fa-circle"></i> គ្រប់គ្រងសិស្ស</a></li>
+                class="fa-regular fa-circle"></i> គ្រប់គ្រងអ្នកប្រើប្រាស់</a></li>
         </ul>
       </li>
 

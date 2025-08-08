@@ -1,29 +1,30 @@
 <?php
 session_start();
 include '../db/conn.php';
-
-// ពិនិត្យថាវិធីសាស្រ្តទិន្នន័យគឺ POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // ទទួលទិន្នន័យពី form
     $id = $_POST['id'];
     $student_id = $_POST['student_id'];
     $username = $_POST['username'];
     $gmail = $_POST['gmail'];
     $major = $_POST['major'];
     $gender = $_POST['gender'];
+    $Education_level = $_POST['Education_level'];
+    $school_year = $_POST['school_year'];
     $user_type = $_POST['user_type'];
     $date = $_POST['date'];
+    $phone = $_POST['phone'];
     $address = $_POST['address'];
-
-    // ធ្វើការអាប់ដេតប្រើ prepared statement
     $stmt = $conn->prepare("UPDATE users SET 
         student_id = ?, 
         username = ?, 
         gmail = ?, 
         major = ?, 
-        gender = ?, 
+        gender = ?,
+        Education_level = ?, 
+        school_year = ?,
         user_type = ?, 
-        date = ?, 
+        date = ?,
+        phone = ?, 
         address = ? 
         WHERE id = ?");
 
@@ -31,29 +32,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Prepare failed: " . $conn->error);
     }
 
-    $stmt->bind_param("ssssssssi", 
+    $stmt->bind_param("sssssssssssi", 
         $student_id, 
         $username, 
         $gmail, 
         $major, 
-        $gender, 
+        $gender,
+        $Education_level,
+        $school_year, 
         $user_type, 
-        $date, 
+        $date,
+        $phone, 
         $address, 
         $id);
 
     if ($stmt->execute()) {
-        // ជោគជ័យ
         $_SESSION['success'] = "ទិន្នន័យត្រូវបានអាប់ដេតដោយជោគជ័យ។";
     } else {
-        // បរាជ័យ
         $_SESSION['error'] = "បរាជ័យក្នុងការអាប់ដេតទិន្នន័យ: " . $stmt->error;
     }
 
     $stmt->close();
     $conn->close();
 
-    // ត្រឡប់ទៅទំព័របញ្ជីអ្នកប្រើ
     header("Location: manage_users.php");
     exit();
 } else {

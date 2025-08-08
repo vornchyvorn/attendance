@@ -28,20 +28,18 @@ if (!$event_result) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
   <style>
     body {
-      font-family: "Khmer OS Siemreap", sans-serif;
+      font-family: "Koulen", sans-serif;
     }
   </style>
 </head>
 <body class="bg-blue-50 min-h-screen flex flex-col">
-
 <!-- Header -->
 <header class="bg-sky-600 sticky top-0 z-50 shadow">
   <nav class="flex items-center justify-between px-4 py-3 md:py-4 md:px-8 max-w-screen-xl mx-auto">
     <!-- Logo -->
     <div class="flex items-center space-x-2">
-      <img src="../pic/logo.jpg" alt="Logo" class="w-[58px] h-[58px] rounded-full"/>
+      <img src="../pic/logo.jpg" alt="Logo" class="w-[58px] h-[58px] rounded"/>
     </div>
-
     <!-- Desktop Menu -->
     <ul class="hidden md:flex items-center space-x-16 text-white text-lg font-medium">
       <li><a href="dashboard.php" class="hover:text-gray-300">ទំព័រដើម</a></li>
@@ -49,7 +47,6 @@ if (!$event_result) {
       <li><a href="participants.php" class="hover:text-gray-300">អ្នកចូលរួម</a></li>
       <li><a href="about.php" class="hover:text-gray-300">អំពីយើង</a></li>
     </ul>
-
     <!-- Right Controls -->
     <div class="flex items-center space-x-3 md:space-x-4">
       <!-- Profile Button -->
@@ -81,25 +78,20 @@ if (!$event_result) {
     <a href="about.php" class="block py-2">អំពីយើង</a>
   </div>
 </header>
-
-
 <!-- Title -->
 <main class="flex-grow">
  <div class="text-center mt-6 mb-4">
   <button class="relative text-xl font-bold text-sky-700 px-6 py-2 border border-sky-700 rounded hover:text-white z-10 transition duration-300 after:content-[''] after:block after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-sky-700">
     សេចក្ដីប្រកាស
 </button>
-
 </div>
-
-
 <!-- Event List -->
 <div class="px-4 md:px-20">
   <?php while ($row = $event_result->fetch_assoc()): ?>
     <div class="bg-white rounded-lg shadow-md p-6 mb-6 max-w-3xl mx-auto border-l-4 border-green-500">
       <h2 class="text-md font-semibold text-green-700 mb-2"><?= htmlspecialchars($row['title']) ?></h2>
-      <p class="text-gray-800 mb-2"><?= nl2br(htmlspecialchars($row['description'])) ?></p>
-      <div class="text-sm text-gray-600">
+      <p class="text-gray-700 mb-2"><?= nl2br(htmlspecialchars($row['description'])) ?></p>
+      <div class="text-sm text-gray-500">
         🗓 ថ្ងៃទី <?= date('d/m/Y', strtotime($row['event_date'])) ?> |
         🕒 ម៉ោង <?= date('g:i A', strtotime($row['event_start'])) ?> ដល់
         <?= date('g:i A', strtotime($row['event_end'])) ?>
@@ -116,7 +108,7 @@ if (!$event_result) {
   <?php while ($row = $result->fetch_assoc()): ?>
     <div class="bg-white rounded-lg shadow-md p-6 mb-6 max-w-3xl mx-auto border-l-4 border-green-500">
       <h2 class="text-md font-semibold text-green-700 mb-2"><?= htmlspecialchars($row['title']) ?></h2>
-      <p class="text-gray-800 leading-relaxed"><?= nl2br(htmlspecialchars($row['content'])) ?></p>
+      <p class="text-gray-700 leading-relaxed"><?= nl2br(htmlspecialchars($row['content'])) ?></p>
       <div class="text-sm text-gray-500 mt-3">
         បានបង្កើតនៅថ្ងៃទី <?= date('d/m/Y g:i A', strtotime($row['created_at'])) ?>
       </div>

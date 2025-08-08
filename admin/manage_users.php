@@ -2,7 +2,7 @@
 session_start();
 include '../db/conn.php';
 
-// Redirect to login if not admin
+// Redirect if not admin
 if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
   header('Location: ../admin/login_admin.php');
   exit();
@@ -11,6 +11,7 @@ if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
 $profile_img = '../pic/user.png';
 $admin_id = $_SESSION['admin_id'];
 
+// Fetch profile image
 $stmt = $conn->prepare("SELECT image FROM admin WHERE admin_id = ?");
 $stmt->bind_param("i", $admin_id);
 $stmt->execute();
@@ -22,14 +23,45 @@ if ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
+// ✅ Pagination logic
+$limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10; // Rows per page (default 10)
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1; // Current page
+if ($page < 1)
+  $page = 1;
 
-$sql = "SELECT * FROM users ORDER BY id DESC";
+$offset = ($page - 1) * $limit;
+
+// Count total rows
+$totalResult = $conn->query("SELECT COUNT(*) as total FROM users");
+$totalRows = $totalResult->fetch_assoc()['total'];
+$totalPages = ceil($totalRows / $limit);
+
+// Fetch paginated data
+$sql = "SELECT * FROM users ORDER BY id DESC LIMIT $limit OFFSET $offset";
 $result = $conn->query($sql);
 ?>
 
+<?php
+include '../db/conn.php';
+
+// Limit & Page setup
+$limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10; // default 10 rows
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;     // current page
+$offset = ($page - 1) * $limit;
+
+// Get total rows
+$totalQuery = $conn->query("SELECT COUNT(*) AS total FROM users");
+$totalRows = $totalQuery->fetch_assoc()['total'];
+$totalPages = ceil($totalRows / $limit);
+
+// Fetch paginated data
+$sql = "SELECT * FROM users ORDER BY id DESC LIMIT $limit OFFSET $offset";
+$result = $conn->query($sql);
+?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,8 +80,7 @@ $result = $conn->query($sql);
   </style>
 </head>
 
-<body class="bg-gray-100 text-gray-800 flex"
-      x-data="{
+<body class="bg-gray-100 text-gray-800 flex" x-data="{
         sidebarOpen: true,
         editModal: false,
         editEvent: {},
@@ -72,14 +103,14 @@ $result = $conn->query($sql);
       <!-- User Dropdown -->
       <li x-data="{ open: false }">
         <button @click="open=!open" class="w-full flex justify-between items-center px-3 py-4 hover:bg-gray-700">
-          <span class="flex items-center gap-3"><i class="fa-solid fa-user"></i> សិស្សចុះឈ្មោះ</span>
+          <span class="flex items-center gap-3"><i class="fa-solid fa-user"></i> ទិន្នន័យអ្នកប្រើប្រាស់</span>
           <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
         </button>
         <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-sm dropdown-menu">
           <li><a href="../admin/add_user.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
                 class="fa-regular fa-circle"></i> ចុះឈ្មោះថ្មី</a></li>
           <li><a href="../admin/manage_users.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
-                class="fa-regular fa-circle"></i> គ្រប់គ្រងសិស្ស</a></li>
+                class="fa-regular fa-circle"></i> គ្រប់គ្រងអ្នកប្រើប្រាស់</a></li>
         </ul>
       </li>
 
@@ -165,13 +196,10 @@ $result = $conn->query($sql);
       </div>
     </div>
     <section>
+
       <div class="container mx-auto mt-8 p-6 bg-white shadow-md rounded-md"
-        x-data="{ search: '', showEditModal: false, editUser: {} }">
-
-        <h1 class="text-2xl font-bold mb-4 text-teal-700 flex items-center gap-2">
-          <i class="fa-solid fa-book"></i> បញ្ជីអ្នកប្រើ
-        </h1>
-
+        x-data="{ search: '', showEditModal: false, editUser: {}, showDetailModal: false }">
+        <h2 class="text-teal-700 text-2xl mb-4 font-semibold"> បញ្ជីអ្នកប្រើប្រាស់</h2>
         <!-- Search & Add User -->
         <div class="flex justify-between mb-4">
           <input type="text" x-model="search" placeholder="ស្វែងរកឈ្មោះ / ជំនាញ"
@@ -194,59 +222,105 @@ $result = $conn->query($sql);
                 <th class="border border-green-800 px-3 py-2 whitespace-nowrap">អុីមែល</th>
                 <th class="border border-green-800 px-3 py-2 whitespace-nowrap">ជំនាញ</th>
                 <th class="border border-green-800 px-3 py-2 whitespace-nowrap">ភេទ</th>
-                <th class="border border-green-800 px-3 py-2 whitespace-nowrap">ប្រភេទ</th>
-                <th class="border border-green-800 px-3 py-2 whitespace-nowrap">ថ្ងៃខែឆ្នាំកំណើត</th>
-                <th class="border border-green-800 px-3 py-2 whitespace-nowrap">អាសយដ្ឋាន</th>
+                <th class="border border-green-800 px-3 py-2 whitespace-nowrap">កម្រិតវប្បធម៍</th>
+                <th class="border border-green-800 px-3 py-2 whitespace-nowrap">ឆ្នាំ</th>
                 <th class="border border-green-800 px-3 py-2 whitespace-nowrap">ផ្សេងៗ</th>
               </tr>
             </thead>
+
             <tbody class="bg-white divide-y divide-gray-200">
               <?php if ($result->num_rows > 0):
                 $i = 1;
                 while ($row = $result->fetch_assoc()): ?>
                   <tr class="hover:bg-green-50 transition-colors" x-show="search === '' || 
-                    '<?= strtolower($row['username']) ?>'.includes(search.toLowerCase()) || 
-                    '<?= strtolower($row['major']) ?>'.includes(search.toLowerCase())">
+                                  '<?= strtolower($row['username']) ?>'.includes(search.toLowerCase()) || 
+                                  '<?= strtolower($row['major']) ?>'.includes(search.toLowerCase())">
                     <td class="border border-gray-200 px-3 py-2"><?= $i++ ?></td>
                     <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['student_id']) ?></td>
+                    <!-- <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['image']) ?></td> -->
                     <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['username']) ?></td>
                     <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['gmail']) ?></td>
                     <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['major']) ?></td>
                     <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['gender']) ?></td>
-                    <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['user_type']) ?></td>
-                    <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['date']) ?></td>
-                    <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['address']) ?></td>
+                    <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['Education_level']) ?></td>
+                    <td class="border border-gray-200 px-3 py-2"><?= htmlspecialchars($row['school_year']) ?></td>
                     <td class="border border-gray-200 px-3 py-2 flex gap-2 justify-center">
-                      <!-- Edit -->
+                      <!-- Detail -->
                       <button @click="editUser = { 
-              id: '<?= $row['id'] ?>',
-              student_id: '<?= $row['student_id'] ?>',
-              username: '<?= $row['username'] ?>',
-              gmail: '<?= $row['gmail'] ?>',
-              major: '<?= $row['major'] ?>',
-              gender: '<?= $row['gender'] ?>',
-              user_type: '<?= $row['user_type'] ?>',
-              date: '<?= $row['date'] ?>',
-              address: '<?= $row['address'] ?>'
-            };
-            showEditModal = true;" class="text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                        id: '<?= $row['id'] ?>',
+                        student_id: '<?= $row['student_id'] ?>',
+                        username: '<?= $row['username'] ?>',
+                        gmail: '<?= $row['gmail'] ?>',
+                        major: '<?= $row['major'] ?>',
+                        gender: '<?= $row['gender'] ?>',
+                        Education_level: '<?= $row['Education_level'] ?>',
+                        school_year: '<?= $row['school_year'] ?>',
+                        user_type: '<?= $row['user_type'] ?>',
+                        date: '<?= $row['date'] ?>',
+                        phone: '<?= $row['phone'] ?>',
+                        address: '<?= $row['address'] ?>'
+                      };
+                      showDetailModal = true;" class="text-green-600 hover:text-green-800 flex items-center gap-1">
+                        <i class="fa-solid fa-eye"></i>
+                      </button>
+
+                      <!-- Edit -->
+                      <button @click="showEditModal = true; /* Existing code */"
+                        class="text-blue-600 hover:text-blue-800 flex items-center gap-1">
                         <i class="fa-solid fa-pen"></i>
                       </button>
+
+                      <!-- Delete -->
                       <button @click="deleteId = <?= $row['id'] ?>; deleteModal = true"
                         class="text-red-600 hover:underline ml-2">
                         <i class="fa-solid fa-trash"></i>
                       </button>
-
-
                     </td>
+
                   </tr>
-                <?php endwhile; else: ?>
+                <?php endwhile; ?>
+              <?php else: ?>
                 <tr>
-                  <td colspan="7" class="text-center text-gray-500 py-4">មិនមានទិន្នន័យទេ។</td>
+                  <td colspan="7" class="text-end text-gray-500 py-4">មិនមានទិន្នន័យទេ។</td>
                 </tr>
               <?php endif; ?>
             </tbody>
           </table>
+          <!-- Pagination UI -->
+          <div class="flex items-center justify-between mt-4">
+            <!-- Rows per page -->
+            <form method="GET" class="flex items-center gap-2">
+              <span>បង្ហាញ:</span>
+              <select name="limit" onchange="this.form.submit()" class="border rounded px-2 py-1">
+                <option value="10" <?= $limit == 10 ? 'selected' : '' ?>>10</option>
+                <option value="25" <?= $limit == 25 ? 'selected' : '' ?>>25</option>
+                <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
+                <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
+              </select>
+              <input type="hidden" name="page" value="<?= $page ?>">
+            </form>
+
+            <!-- Pagination links -->
+            <div class="flex gap-2">
+              <?php if ($page > 1): ?>
+                <a href="?page=<?= $page - 1 ?>&limit=<?= $limit ?>"
+                  class="px-3 py-1 border rounded hover:bg-gray-100">Prev</a>
+              <?php endif; ?>
+
+              <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <a href="?page=<?= $i ?>&limit=<?= $limit ?>"
+                  class="px-3 py-1 border rounded hover:bg-green-100 <?= $i == $page ? 'bg-green-700 text-white' : '' ?>">
+                  <?= $i ?>
+                </a>
+              <?php endfor; ?>
+
+              <?php if ($page < $totalPages): ?>
+                <a href="?page=<?= $page + 1 ?>&limit=<?= $limit ?>"
+                  class="px-3 py-1 border rounded hover:bg-gray-100">Next</a>
+              <?php endif; ?>
+            </div>
+          </div>
+
         </div>
         <!-- Edit Modal -->
         <div x-show="showEditModal" style="display: none;"
@@ -292,6 +366,19 @@ $result = $conn->query($sql);
                 </div>
 
                 <div class="mb-3">
+                  <label class="block mb-1">កម្រិតវប្បធម៍</label>
+                  <input type="text" name="Education_level" x-model="editUser.Education_level"
+                    class="w-full border px-3 py-2 rounded" required>
+                </div>
+
+
+                <div class="mb-3">
+                  <label class="block mb-1">ឆ្នាំទី</label>
+                  <input type="text" name="school_year" x-model="editUser.school_year"
+                    class="w-full border px-3 py-2 rounded" required>
+                </div>
+
+                <div class="mb-3">
                   <label class="block mb-1">ប្រភេទអ្នកប្រើ</label>
                   <input type="text" name="user_type" x-model="editUser.user_type"
                     class="w-full border px-3 py-2 rounded" required>
@@ -300,6 +387,12 @@ $result = $conn->query($sql);
                 <div class="mb-3">
                   <label class="block mb-1">ថ្ងៃ/ខែ/ឆ្នាំ</label>
                   <input type="date" name="date" x-model="editUser.date" class="w-full border px-3 py-2 rounded"
+                    required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="block mb-1">លេខទូរសព្ទ</label>
+                  <input type="phone" name="phone" x-model="editUser.phone" class="w-full border px-3 py-2 rounded"
                     required>
                 </div>
 
@@ -319,10 +412,35 @@ $result = $conn->query($sql);
             </form>
           </div>
         </div>
+
+        <!-- Detail Modal -->
+        <div x-show="showDetailModal" style="display: none;"
+          class="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50"
+          @click.away="showDetailModal = false">
+          <div class="bg-white p-6 rounded-lg w-full max-w-xl shadow-md">
+            <h2 class="text-xl font-semibold mb-4 text-teal-600">ព័ត៌មានលម្អិតអ្នកប្រើ</h2>
+            <div class="grid grid-cols-2 gap-4 text-gray-500">
+              <p><strong>អត្តលេខ:</strong> <span x-text="editUser.student_id"></span></p>
+              <p><strong>ឈ្មោះ:</strong> <span x-text="editUser.username"></span></p>
+              <p><strong>អុីមែល:</strong> <span x-text="editUser.gmail"></span></p>
+              <p><strong>ជំនាញ:</strong> <span x-text="editUser.major"></span></p>
+              <p><strong>ភេទ:</strong> <span x-text="editUser.gender"></span></p>
+              <p><strong>កម្រិតវប្បធម៌:</strong> <span x-text="editUser.Education_level"></span></p>
+              <p><strong>ឆ្នាំទី:</strong> <span x-text="editUser.school_year"></span></p>
+              <p><strong>ប្រភេទ:</strong> <span x-text="editUser.user_type"></span></p>
+              <p><strong>ថ្ងៃខែឆ្នាំកំណើត:</strong> <span x-text="editUser.date"></span></p>
+              <p><strong>លេខទូរសព្ទ:</strong> <span x-text="editUser.phone"></span></p>
+              <p><strong>អាសយដ្ឋាន:</strong> <span x-text="editUser.address"></span></p>
+            </div>
+            <div class="flex justify-end mt-4">
+              <button @click="showDetailModal = false" class="bg-teal-600 text-white px-4 py-2 rounded">បិទ</button>
+            </div>
+          </div>
+        </div>
+
         <!-- delete -->
-        <div x-show="deleteModal" x-transition
-          class="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50" style="display: none;"
-          @click.away="deleteModal = false">
+        <div x-show="deleteModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50"
+          style="display: none;" @click.away="deleteModal = false">
 
           <div class="bg-white w-full max-w-sm p-6 rounded shadow relative">
             <h3 class="text-lg font-semibold text-red-600 text-center mb-4">
@@ -341,14 +459,9 @@ $result = $conn->query($sql);
             </form>
           </div>
         </div>
-
-
       </div>
     </section>
-
   </main>
-
-
   <script>
     document.querySelectorAll('#menu .dropdown-toggle').forEach(toggle => {
       toggle.addEventListener('click', e => {

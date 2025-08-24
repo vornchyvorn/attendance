@@ -78,9 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link href="../dist/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&family=Koulen&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: "Khmer OS Siemreap", sans-serif;
+             font-family: "Kantumruy Pro", sans-serif;
         }
     </style>
 </head>
@@ -105,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Student ID -->
             <div>
-                <label for="student_id" class="block mb-1 text-teal-700 font-semibold">អត្តលេខសិស្ស</label>
+                <label for="student_id" class="block mb-1 text-teal-700 font-semibold">អត្តលេខអ្នកប្រើប្រាស់</label>
                 <input type="text" id="student_id" name="student_id" placeholder="បញ្ជូលអត្តលេខ" required
                     class="w-full p-3 border border-teal-600 rounded text-base md:text-lg">
             </div>

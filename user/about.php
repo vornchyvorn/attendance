@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>សេចក្ដីប្រកាស</title>
   <link href="../dist/style.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&family=Koulen&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
   <style>
     body{
 
-      font-family: "Koulen", sans-serif;
+      font-family: "Kantumruy Pro", sans-serif;
     }
   </style>
 </head>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Desktop Menu -->
-    <ul class="hidden md:flex items-center space-x-16 text-white text-lg font-medium">
+    <ul class="hidden md:flex items-center space-x-16 text-white text-xl font-medium">
       <li><a href="dashboard.php" class="hover:text-gray-300">ទំព័រដើម</a></li>
       <li><a href="announcements.php" class="hover:text-gray-300">ប្រកាស</a></li>
       <li><a href="participants.php" class="hover:text-gray-300">អ្នកចូលរួម</a></li>

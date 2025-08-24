@@ -28,12 +28,12 @@ $result = $conn->query($sql);
     <title>បញ្ជីអ្នកចូលរួម</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="../dist/style.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&family=Koulen&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
     <style>
         body {
-            font-family: "Koulen", sans-serif;
+            font-family: "Kantumruy Pro", sans-serif;
             background-color: #f0f8ff;
         }
         table.dataTable thead th {
@@ -80,7 +80,7 @@ $result = $conn->query($sql);
     </div>
 
     <!-- Desktop Menu -->
-    <ul class="hidden md:flex items-center space-x-16 text-white text-lg font-medium">
+    <ul class="hidden md:flex items-center space-x-16 text-white text-xl font-medium">
       <li><a href="dashboard.php" class="hover:text-gray-300">ទំព័រដើម</a></li>
       <li><a href="announcements.php" class="hover:text-gray-300">ប្រកាស</a></li>
       <li><a href="participants.php" class="hover:text-gray-300">អ្នកចូលរួម</a></li>

@@ -3,11 +3,10 @@ session_start();
 
 include '../db/conn.php';
 
-if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: login_admin.php');
+if (!isset($_SESSION['admin_id'])) {
+    header('Location: ../admin/login_admin.php');
     exit();
 }
-
 $admin_id = $_SESSION['admin_id'];
 
 

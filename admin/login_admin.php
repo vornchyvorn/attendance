@@ -7,37 +7,31 @@ $error = '';
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
-    $role = $_POST['role']; 
 
-    if (!in_array($role, ['admin', 'staff'])) {
-        $error = "តួនាទីមិនត្រឹមត្រូវ!";
-    } else {
-        $stmt = $conn->prepare("SELECT * FROM admin WHERE username = ? AND role = ? LIMIT 1");
-        $stmt->bind_param("ss", $username, $role);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    // ពីព្រោះ role ត្រូវបានលុបចេញហើយ មិនចាំបាច់ពិនិត្យ role ទៀតទេ
 
-        if ($admin = $result->fetch_assoc()) {
-            if (password_verify($password, $admin['password'])) {
-                $_SESSION['admin_id'] = $admin['admin_id'];
-                $_SESSION['username'] = $admin['username'];
-                $_SESSION['role'] = $admin['role'];
-                if ($admin['role'] === 'staff') {
-                    header("Location: staff_dashboard.php");
-                } else {
-                    header("Location: dashbord.php"); 
-                }
-                exit;
-            } else {
-                $error = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!";
-            }
+    $stmt = $conn->prepare("SELECT * FROM admin WHERE username = ? LIMIT 1");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($admin = $result->fetch_assoc()) {
+        if (password_verify($password, $admin['password'])) {
+            $_SESSION['admin_id'] = $admin['admin_id'];
+            $_SESSION['username'] = $admin['username'];
+
+            // ទាំងអស់ចូលទៅ dashboard តែមួយ បើ role ត្រូវបានលុបចោល
+            header("Location: dashbord.php");
+            exit;
         } else {
-            $error = "ឈ្មោះអ្នកប្រើ ឬតួនាទីមិនត្រឹមត្រូវ!";
+            $error = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ!";
         }
+    } else {
+        $error = "ឈ្មោះអ្នកប្រើមិនត្រឹមត្រូវ!";
     }
 }
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="km">
@@ -59,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div class="container flex items-center justify-center">
         <form method="POST" class="bg-white p-6 rounded shadow w-100">
             <img src="../pic/logo.jpg" alt="logo" class="w-20 block m-auto mb-4">
-            <p class="text-center text-xl">Institute Management System</p><br>
+            <p class="text-center text-xl">Event Management System</p><br>
             
             <?php if ($error): ?>
                 <p class="text-red-500 mb-2"><?= $error ?></p>
@@ -69,12 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             
             <input type="password" name="password" placeholder=" Password..." required class="border border-teal-700 p-3 w-full mb-6 rounded-full">
             
-            
-            <select name="role" required class="border border-teal-700 p-3 w-full mb-6 rounded-full text-gray-700">
-                <option value="">Select Role...</option>
-                <option value="admin">Admin</option>
-                <option value="staff">Staff</option>
-            </select>
 
             <button class="bg-teal-600 text-white w-[170px] p-3 rounded-full m-auto block">
                 <i class="fa-solid fa-right-from-bracket"></i> Login

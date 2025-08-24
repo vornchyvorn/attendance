@@ -39,11 +39,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="/public/style.css">
+     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&family=Koulen&display=swap" rel="stylesheet">
     <link href="../dist/style.css" rel="stylesheet">
     <style>
     body {
-      font-family: "Khmer OS Siemreap", sans-serif;
+       font-family: "Kantumruy Pro", sans-serif;
     }
   </style>
 </head>

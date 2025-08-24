@@ -3,8 +3,8 @@ session_start();
 include '../db/conn.php';
 
 // Check if user is admin (adjust your session check)
-if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: login_admin.php");
+if (!isset($_SESSION['admin_id'])) {
+    header('Location: ../admin/login_admin.php');
     exit();
 }
 

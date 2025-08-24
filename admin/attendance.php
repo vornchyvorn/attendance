@@ -2,12 +2,11 @@
 session_start();
 include '../db/conn.php';
 
-// Redirect to login if not admin
-if (!isset($_SESSION['admin_id']) || $_SESSION['role'] !== 'admin') {
+// Redirect to login if not logged in as admin
+if (!isset($_SESSION['admin_id'])) {
     header('Location: ../admin/login_admin.php');
     exit();
 }
-
 $profile_img = '../pic/user.png'; 
 $admin_id = $_SESSION['admin_id'];
 
@@ -108,9 +107,10 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
     <link href="../dist/style.css" rel="stylesheet">
     <script src="//unpkg.com/alpinejs" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&family=Koulen&display=swap" rel="stylesheet">
     <style>
         * {
-            font-family: 'Khmer OS Siemreap', sans-serif;
+            font-family: "Kantumruy Pro", sans-serif;
         }
 
         .dropdown-menu {
@@ -123,7 +123,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
 
     <!-- Sidebar -->
     <aside :class="sidebarOpen ? 'w-64' : 'w-0', sidebarOpen ? 'p-4' : 'p-0'"
-        class="bg-[#111811] text-white overflow-hidden h-screen fixed left-0 top-0 transition-all duration-300">
+        class="bg-[#111811] text-white text-lg overflow-hidden h-screen fixed left-0 top-0 transition-all duration-300">
         <div class="flex items-center mb-4" x-show="sidebarOpen" x-transition>
             <img src="../pic/logo.jpg" class="w-[60px] h-[60px] mt-2 rounded-full ml-20" alt="logo">
         </div>
@@ -140,7 +140,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                     <span class="flex items-center gap-3"><i class="fa-solid fa-user"></i>ទិន្នន័យអ្នកប្រើប្រាស់</span>
                     <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
                 </button>
-                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-sm dropdown-menu">
+                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-base dropdown-menu">
                     <li><a href="../admin/add_user.php" class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
                                 class="fa-regular fa-circle"></i> ចុះឈ្មោះថ្មី</a></li>
                     <li><a href="../admin/manage_users.php"
@@ -156,7 +156,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                     <span class="flex items-center gap-3"><i class="fa-solid fa-calendar-plus"></i> ព្រឹត្តិការណ៍</span>
                     <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
                 </button>
-                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-sm dropdown-menu">
+                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-base dropdown-menu">
                     <li><a href="../admin/create_event.php"
                             class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
                                 class="fa-regular fa-circle"></i> បង្កើតព្រឹត្តិការណ៍ថ្មី</a></li>
@@ -173,7 +173,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                     <span class="flex items-center gap-3"><i class="fa-solid fa-plus"></i> ជំនាញ</span>
                     <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
                 </button>
-                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-4 text-sm dropdown-menu">
+                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-4 text-base dropdown-menu">
                     <li><a href="../admin/create_skills.php"
                             class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
                                 class="fa-regular fa-circle"></i> បង្កើតជំនាញថ្មី</a></li>
@@ -188,7 +188,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                             class="fa-solid fa-clipboard-user"></i>គ្រប់គ្រងវត្តមាន</span>
                     <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
                 </button>
-                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-4 text-sm dropdown-menu">
+                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-4 text-base dropdown-menu">
                     <li><a href="../admin/attendance.php"
                             class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
                                 class="fa-regular fa-circle"></i>បញ្ជីវត្តមានអ្នកចូលរួម</a></li>
@@ -202,7 +202,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                     <span class="flex items-center gap-3"><i class="fa-solid fa-bullhorn"></i> សេចក្ដីជូនដំណឹង</span>
                     <i :class="open?'fa-chevron-up':'fa-chevron-down'" class="fa-solid"></i>
                 </button>
-                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-sm dropdown-menu">
+                <ul x-show="open" x-transition class="pl-6 px-3 mt-1 space-y-3 text-base dropdown-menu">
                     <li><a href="../admin/create_announcements.php"
                             class="flex items-center gap-3 py-4 w-full hover:bg-gray-700"><i
                                 class="fa-regular fa-circle"></i> បង្កើតសេចក្ដីជូនដំណឹង</a></li>
@@ -230,10 +230,10 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                 <div x-show="open" @click.outside="open = false" x-transition
                     class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
                     <a href="../admin/profile_admin.php"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">
                         <i class="fa-solid fa-id-badge mr-2"></i> ព័ត៌មានគណនី
                     </a>
-                    <a href="../admin/logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-100">
+                    <a href="../admin/logout.php" class="block px-4 py-2 text-base text-red-600 hover:bg-red-100">
                         <i class="fa-solid fa-sign-out-alt mr-2"></i> ចាកចេញ
                     </a>
                 </div>
@@ -245,7 +245,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
 
             <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-white shadow p-4 rounded-lg">
                 <div>
-                    <label class="block text-sm text-gray-600 mb-1">ជំនាញ</label>
+                    <label class="block text-base text-gray-600 mb-1">ជំនាញ</label>
                     <select name="major_name" class="w-full border rounded px-3 py-2">
                         <option value="">-- ជ្រើសរើស --</option>
                         <?php
@@ -261,7 +261,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                 </div>
 
                 <div>
-                    <label class="block text-sm text-gray-600 mb-1">ព្រឹត្តិការណ៍</label>
+                    <label class="block text-base text-gray-600 mb-1">ព្រឹត្តិការណ៍</label>
                     <select name="event_id" class="w-full border rounded px-3 py-2">
                         <option value="">-- ជ្រើសរើស --</option>
                         <?php
@@ -285,18 +285,18 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                 $event_end = $_GET['event_end'] ?? '';
                 ?>
                 <div>
-                    <label class="block text-sm text-gray-600 mb-1">ចាប់ពីថ្ងៃទី</label>
+                    <label class="block text-base text-gray-600 mb-1">ចាប់ពីថ្ងៃទី</label>
                     <input type="date" name="event_start" value="<?= htmlspecialchars($event_start) ?>"
                         class="w-full border rounded px-3 py-2">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-600 mb-1">ដល់ថ្ងៃទី</label>
+                    <label class="block text-base text-gray-600 mb-1">ដល់ថ្ងៃទី</label>
                     <input type="date" name="event_end" value="<?= htmlspecialchars($event_end) ?>"
                         class="w-full border rounded px-3 py-2">
                 </div>
 
                 <div>
-                    <label class="block text-sm text-gray-600 mb-1">វេលា</label>
+                    <label class="block text-base text-gray-600 mb-1">វេលា</label>
                     <select name="time_period" class="w-full border rounded px-3 py-2">
                         <option value="">-- ជ្រើសរើស --</option>
                         <option value="morning" <?= $time_period === 'morning' ? 'selected' : '' ?>>ព្រឹក</option>
@@ -321,7 +321,7 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
         </form>
 
         <div class="bg-white shadow rounded-lg overflow-x-auto p-4">
-            <table class="min-w-full text-sm text-left border">
+            <table class="min-w-full text-base text-center border">
                 <thead class="bg-teal-600 text-white">
                     <tr>
                         <th class="px-4 py-2 border">#</th>
@@ -338,19 +338,19 @@ $majors_result = $conn->query("SELECT DISTINCT major FROM users ORDER BY major A
                         $i = 1;
                         while ($row = $result->fetch_assoc()): ?>
                             <tr class="border-t hover:bg-gray-50">
-                                <td class="px-4 py-2 text-center font-medium"><?= $i++ ?></td>
-                                <td class="px-4 py-2"><?= htmlspecialchars($row['username']) ?></td>
-                                <td class="px-4 py-2"><?= htmlspecialchars($row['student_id']) ?></td>
-                                <td class="px-4 py-2"><?= htmlspecialchars($row['major']) ?></td>
-                                <td class="px-4 py-2  capitalize"><?= $row['time_period'] ?></td>
-                                <td class="px-4 py-2  text-green-700 font-semibold"><?= $row['check_in'] ?></td>
-                                <td class="px-4 py-2 ">
+                                <td class="px-4 py-2 text-center text-base"><?= $i++ ?></td>
+                                <td class="px-4 py-2 text-base"><?= htmlspecialchars($row['username']) ?></td>
+                                <td class="px-4 py-2 text-base"><?= htmlspecialchars($row['student_id']) ?></td>
+                                <td class="px-4 py-2 text-base"><?= htmlspecialchars($row['major']) ?></td>
+                                <td class="px-4 py-2 text-base capitalize"><?= $row['time_period'] ?></td>
+                                <td class="px-4 py-2 text-base text-green-700 font-semibold"><?= $row['check_in'] ?></td>
+                                <td class="px-4 py-2 text-base ">
                                     <?= $row['check_out'] ? '<span class="text-blue-700 font-semibold">' . $row['check_out'] . '</span>' : '<span class="text-red-500">មិនទាន់ចេញ</span>' ?>
                                 </td>
                             </tr>
                         <?php endwhile; else: ?>
                         <tr>
-                            <td colspan="7" class="text-center text-gray-500 py-4">មិនមានទិន្នន័យទេ។</td>
+                            <td colspan="7" class="text-center text-base text-gray-500 py-4">មិនមានទិន្នន័យទេ។</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
